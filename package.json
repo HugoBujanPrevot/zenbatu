@@ -1,0 +1,31 @@
+{
+  "name": "zenbatu",
+  "version": "1.0.0",
+  "description": "Asset tracking app built for the Agile Software Development course from University of London Goldsmith's BSc in Computer Science.",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HugoBujanPrevot/zenbatu.git"
+  },
+  "keywords": [
+    "asset",
+    "tracking",
+    "app",
+    "management",
+    "reservation"
+  ],
+  "author": "Team 24",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/HugoBujanPrevot/zenbatu/issues"
+  },
+  "homepage": "https://github.com/HugoBujanPrevot/zenbatu#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "mysql": "^2.18.1"
+  }
+}
