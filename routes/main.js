@@ -1,6 +1,6 @@
 
 // Initialize all our end-points here
-export function initRoutes(expressApp)
+module.exports.initRoutes = function (expressApp)
 {
     // Index end-point
     expressApp.get("/", (req, res) =>
