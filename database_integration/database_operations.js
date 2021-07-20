@@ -5,9 +5,11 @@ const DbOperationError = require("../errors/db_operation_error");
 // Creates a database, provided a connection object and a name
 module.exports.createDatabase = (dbConnection, dbName) =>
 {
+    // Check if dbConnection object is the right type
     if (dbConnection instanceof DbConnectionPrototype === false)
         throw new TypeError(`Expected object of type ${dbConnectionPrototype.name}, got ${dbConnection} instead.`);
 
+    // Check that the given dbName is indeed a string
     if (typeof dbName !== "string")
         throw new TypeError(`Expected string, got '${dbName}' instead.`);
 
