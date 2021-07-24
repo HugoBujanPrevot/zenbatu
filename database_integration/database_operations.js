@@ -1,19 +1,67 @@
 
-const DbConnectionPrototype = require("./database_connection");
+
+/**
+ * This module contains all the necessary database queries encapsulated into 
+ * their own functions for convenience. Queries are made in SQL (all the different 
+ * query commands can be found here https://dev.mysql.com/doc/refman/8.0/en/sql-statements.html).
+ * They use the query() function found in the database_connection module to pass
+ * one of said SQL statements directly to the database, and get the result back.
+ * It's all done through Promises (https://www.w3schools.com/js/js_promise.asp) since
+ * a database query is an asynchronous operation, and Promises make it cleaner than
+ * using regular callbacks.
+ */
+
+
+const dbConnection = require("./database_connection");
+const dbInitializer = require("./database_initializer");
 const DbOperationError = require("../errors/db_operation_error");
 
-// Creates a database, provided a connection object and a name
-module.exports.createDatabase = (dbConnection, dbName) =>
+
+module.exports.createConnection = (hostIp, username, password) =>
 {
-    // Check if dbConnection object is the right type
-    if (dbConnection instanceof DbConnectionPrototype === false)
-        throw new TypeError(`Expected object of type ${dbConnectionPrototype.name}, got ${dbConnection} instead.`);
+    dbConnection.createConnection(hostIp, username, password);
+};
 
-    // Check that the given dbName is indeed a string
-    if (typeof dbName !== "string")
-        throw new TypeError(`Expected string, got '${dbName}' instead.`);
+module.exports.connect = () =>
+{
+    return dbConnection.connect()
+    .then(() => dbInitializer.initializeDb(dbConnection))
+};
 
-    // Construct query string and pass it to the connection object to query the database
-    return dbConnection.query(`CREATE DATABASE IF NOT EXISTS ${dbName}`)
-    .catch((err) => Promise.reject(new DbOperationError(`Creating database with name ${dbName} failed\n\n:${err.stack}`)));
+
+
+// Get all assets in the database and return them
+module.exports.addAsset = (assetName) =>
+{
+    // Select All from the Assets table (check database diagram) and return the result
+    return dbConnection.query(`INSERT INTO Assets (asset_name) VALUES (${assetName})`)
+    .catch((err) => Promise.reject(new DbOperationError(`Failed to select all assets\n\n:${err.stack}`)));
+};
+
+// Get all assets in the database and return them
+module.exports.getAsset = (assetNameOrId) =>
+{
+    // Select an asset from the Assets table (check database diagram) and return the result
+    return dbConnection.query(`SELECT * FROM Assets WHERE name = '${assetNameOrId}' OR asset_id = '${assetNameOrId}'`)
+    .catch((err) => Promise.reject(new DbOperationError(`Failed to select the asset\n\n:${err.stack}`)));
+};
+
+// Get all assets in the database and return them
+module.exports.getAssets = () =>
+{
+    // Select All from the Assets table (check database diagram) and return the result
+    return dbConnection.query(`SELECT * FROM Assets`)
+    .catch((err) => Promise.reject(new DbOperationError(`Failed to select all assets\n\n:${err.stack}`)));
+};
+
+// Get all assets in the database and return them
+module.exports.getAssetLocation = (assetId) =>
+{
+    // Check that the given assetId (the asset's database id, to be clear) is indeed an integer
+    if (Number.isInteger(assetId) === false)
+        throw new TypeError(`Expected integer asset id, got '${assetId}' instead.`);
+
+    // Select the asset with given id from the AssetLocation table and return it
+    return dbConnection.query(`SELECT FROM AssetLocation WHERE asset_id=${assetId}`)
+    .catch((err) => Promise.reject(new DbOperationError(`Failed to select all assets\n\n:${err.stack}`)));
 };

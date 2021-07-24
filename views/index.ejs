@@ -1,0 +1,45 @@
+
+
+<!DOCTYPE html>
+<html>
+    <head>
+
+        <!-- Popper and Bootstrap JS -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+        <!-- Bootstrap 4 -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+        <!-- Personal style sheet -->
+        <link rel="stylesheet" href="./css/styles.css">
+
+        <title>Zenbatu Home Page</title>
+
+    </head>
+
+    <body>
+
+        <%- include('./partials/navbar.ejs', { page: "home" })-%>
+
+        <form id="connectForm" action="/connect" method="POST">
+            <input id="ipInput" name="ip" type="text" placeholder="Database IP">
+            <input id="userInput" name="user" type="text" placeholder="Username">
+            <input id="passwordInput" name="password" type="password" placeholder="Password">
+            <input type="submit" value="Connect to Database" >
+        </form>
+
+        <!-- If connection succeeded, give feedback -->
+        <% if (typeof connected === "boolean" && connected === true) { %>
+
+            <span>Connected successfully!</span>
+
+        <!-- If an error occurred while doing so, render it as well -->
+        <% } else if (typeof error === "string") { %>
+
+            <span>Could not connect to the database: <%=error %> </span>
+
+        <% } %>
+
+    </body>
+</html>

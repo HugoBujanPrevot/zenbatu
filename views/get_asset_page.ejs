@@ -1,0 +1,39 @@
+
+
+<!DOCTYPE html>
+<html>
+    <head>
+
+        <!-- Popper and Bootstrap JS -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+        <!-- Bootstrap 4 -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+        <!-- Personal style sheet -->
+        <link rel="stylesheet" href="./css/styles.css">
+
+        <title>Zenbatu Get Asset Page</title>
+
+    </head>
+
+    <body>
+
+        <%- include('./partials/navbar.ejs', { page: "get_asset" })-%>
+        
+
+        <label for="getAssetByNameForm">Get Asset by Name</label>
+        <form id="getAssetByNameForm" action="/get_asset" method="GET">
+            <input id="assetNameInput" type="text" name="name" placeholder="Asset Name">
+            <input type="submit" value="Find" >
+        </form>
+
+        <label for="getAssetByIdForm">Get Asset by Id</label>
+        <form id="getAssetByIdForm" action="/get_asset" method="GET">
+            <input id="assetIdInput" type="text" name="id" placeholder="Asset Id">
+            <input type="submit" value="Find" >
+        </form>
+
+    </body>
+</html>

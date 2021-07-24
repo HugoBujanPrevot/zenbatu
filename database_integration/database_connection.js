@@ -1,65 +1,56 @@
 
 const mysql = require("mysql");
 
+var dbConnection;
 
-class DatabaseConnection {
 
-    #db;
-    #host;
-    #user;
+/** Creates a connection instance to a database and 
+ * stores it for the rest of the program 
+ */
+module.exports.createConnection = (hostIp, user, password) =>
+{
+    if (typeof hostIp !== "string")
+        throw new TypeError(`Expected string for ip, got '${typeof hostIp}' instead:\n\n`, hostIp);
 
-    /** Creates a connection instance to a database */
-    constructor(hostIp, user, password)
+    if (typeof user !== "string")
+        throw new TypeError(`Expected string for username, got '${typeof user}' instead`);
+        
+    if (typeof password !== "string")
+        throw new TypeError(`Expected string for password, got '${typeof password}' instead`);
+
+    dbConnection = mysql.createConnection({
+        host: hostIp,
+        user: user,
+        password: password
+    });
+};
+
+/** Attempt to connect to the database and resolve the
+ * promise if successful; otherwise reject it with an error
+ */
+module.exports.connect = () =>
+{
+    return new Promise((resolve, reject) =>
     {
-        this.#host = hostIp;
-        this.#user = user;
-
-        this.#db = mysql.createConnection({
-            host: this.#host,
-            user: this.#user,
-            password: password
-        });
-    }
-
-    get host()
-    {
-        return this.#host;
-    }
-
-    get user()
-    {
-        return this.#user;
-    }
-
-    /** Attempt to connect to the database and resolve the
-     * promise if successful; otherwise reject it with an error
-     */
-    connect()
-    {
-        return new Promise((resolve, reject) =>
+        dbConnection.connect((err) =>
         {
-            this.#db.connect((err) =>
-            {
-                if (err) reject(err);
-                else resolve();
-            });
+            if (err) reject(err);
+            else resolve();
         });
-    }
+    });
+};
 
-    /** Send a query to the database and resolve its result,
-     * or reject the promise with an error, if any.
-     */
-    query(...args)
+/** Send a query to the database and resolve its result,
+ * or reject the promise with an error, if any.
+ */
+module.exports.query = (...args) =>
+{
+    return new Promise((resolve, reject) =>
     {
-        return new Promise((resolve, reject) =>
+        dbConnection.query(...args, (err, result) =>
         {
-            db.query(...args, (err, result) =>
-            {
-                if (err) reject(err);
-                else resolve(result);
-            });
+            if (err) reject(err);
+            else resolve(result);
         });
-    }
-}
-
-module.exports = DatabaseConnection;
+    });
+};
