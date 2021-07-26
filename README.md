@@ -5,8 +5,8 @@ Asset-tracking and management application designed for University of London Gold
 ## How to Contribute
 To start contributing, make sure you install [Git](https://git-scm.com/downloads) and [NodeJS](https://nodejs.org/en/download/). Once these are installed, follow the steps below:
 
-1. Open a command line console wherever you want to keep the project (shift+right click on a folder on Windows, then "Open Powershell window here"), and type "git clone https://github.com/HugoBujanPrevot/zenbatu".
-2. Once the repository is cloned, in the same console window, type "npm install". This will automatically install all of the required node packages specified in the package.json file.
+1. Open a command line console wherever you want to keep the project (shift+right click on a folder on Windows, then "Open Powershell window here"), and type `git clone https://github.com/HugoBujanPrevot/zenbatu`.
+2. Once the repository is cloned, in the same console window, type `npm install`. This will automatically install all of the required node packages specified in the package.json file.
 3. You can start working on the project now. If you don't know how to use Git, there are a few [guides](https://github.com/git-guides) that can help.
 
 
@@ -26,3 +26,4 @@ The /database_integration is the package where all database-related code happens
 The /asset_manager, /account_manager and /report_manager are the packages that will do the heavy lifting for the business logic. They will interact with the database_operations module to fetch, update and delete database records, and with the /router to return the adequate data to be sent back to a client's request.
 
 Finally, the /client folder contains all client-side content, like the CSS stylesheets or front-end JavaScript code that runs directly on the client's browser. As such, no other module in the application has direct access to this code, and vice-versa. They occur on two separate sides: on the machine hosting the server for everything outside of /client, and on the user's browser for the code within /client.
+
