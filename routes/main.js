@@ -42,13 +42,15 @@ module.exports.initRoutes = function (expressApp)
             name: request.query.name,
             id: request.query.id
         })
-        .then((assetInfo) => console.log(assetInfo));
+        .then((result) => console.log(result));
     });
 
     expressApp.post("/add_asset", (request, response) =>
     {
-        console.log(`User sent the following data:\n\n`, request.body);
-        return assetManager.addAsset(request.body.name)
-        .then((assetInfo) => console.log(assetInfo));
+        var assetData = request.body;
+
+        console.log(`User sent the following data:\n\n`, assetData);
+        return assetManager.addAsset(assetData.name)
+        .then((result) => console.log(result));
     });
 }
