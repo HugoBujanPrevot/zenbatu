@@ -7,6 +7,7 @@ const ASSET_TABLE = "Assets";
 const ASSET_LOCATION_TABLE = "AssetLocation";
 const ASSET_TYPE_TABLE = "AssetType";
 const ASSET_PURCHASE_TABLE = "AssetPurchase";
+const ASSET_MAINTENANCE_TABLE = "AssetMaintenance";
 const SITES_TABLE = "Sites";
 const LOCATIONS_TABLE = "Locations";
 const CATEGORIES_TABLE = "Categories";
@@ -22,15 +23,46 @@ module.exports.initializeDb = (dbConnection) =>
         added_date: "DATETIME DEFAULT CURRENT_TIMESTAMP",
         addded_by: "CHAR(50) DEFAULT 'Admin'"
     }))
-    .catch((err) => Promise.reject(new DbOperationError(`Error initializing database:\n\n${err.stack}`)));
     /*.then(() => _createTable(dbConnection, ASSET_LOCATION_TABLE, {
-        asset_id: `INT NOT NULL PRIMARY KEY FOREIGN KEY REFERENCES ${ASSET_TABLE}(asset_id)`,
+        asset_id: `INT NOT NULL PRIMARY KEY FOREIGN KEY REFERENCES ${ASSET_TABLE}(asset_id) ON DELETE CASCADE`,
         site_id: `INT NOT NULL FOREIGN KEY REFERENCES ${SITES_TABLE}(site_id)`,
         location_id: `INT NOT NULL FOREIGN KEY REFERENCES ${LOCATIONS_TABLE}(location_id)`,
         last_edit: "DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"
+    }))
+    .then(() => _createTable(dbConnection, ASSET_TYPE_TABLE, {
+        asset_id: `INT NOT NULL PRIMARY KEY FOREIGN KEY REFERENCES ${ASSET_TABLE}(asset_id) ON DELETE CASCADE`,
+        brand: "CHAR(50) NOT NULL",
+        model: "CHAR(100) NOT NULL",
+        serial_no: "CHAR(50) NOT NULL",
+        category_id: `INT FOREIGN KEY REFERENCES ${CATEGORIES_TABLE}(category_id)`
+    }))
+    .then(() => _createTable(dbConnection, ASSET_PURCHASE_TABLE, {
+        asset_id: `INT NOT NULL PRIMARY KEY FOREIGN KEY REFERENCES ${ASSET_TABLE}(asset_id) ON DELETE CASCADE`,
+        purchase_date: "DATE NOT NULL",
+        cost: "DECIMAL(12, 2) NOT NULL",
+        vendor: "CHAR(50) NOT NULL"
+    }))
+    /then(() => _createTable(dbConnection, ASSET_MAINTENANCE_TABLE, {
+        asset_id: `INT NOT NULL PRIMARY KEY FOREIGN KEY REFERENCES ${ASSET_TABLE}(asset_id) ON DELETE CASCADE`,
+        last_maintenance_date: "DATE",
+        maintenance_schedule: "CHAR(100) NOT NULL",
+        serial_no: "CHAR(50) NOT NULL"
+    }))
+    .then(() => _createTable(dbConnection, SITES_TABLE, {
+        site_id: "INT AUTO_INCREMENT PRIMARY KEY",
+        name: "CHAR(50) NOT NULL"
+    }))
+    .then(() => _createTable(dbConnection, LOCATIONS_TABLE, {
+        location_id: "INT AUTO_INCREMENT PRIMARY KEY",
+        site_id: `INT NOT NULL FOREIGN KEY REFERENCES ${SITES_TABLE}(site_id)`,
+        name: "CHAR(50) NOT NULL"
+    }))
+    .then(() => _createTable(dbConnection, CATEGORIES_TABLE, {
+        category_id: "INT AUTO_INCREMENT PRIMARY KEY",
+        name: "CHAR(50) NOT NULL"
     }))*/
+    .catch((err) => Promise.reject(new DbOperationError(`Error initializing database:\n\n${err.stack}`)));
 };
-
 
 
 // Creates a database, provided a connection object and a name
