@@ -29,13 +29,39 @@ module.exports.connect = () =>
 };
 
 
-
 // Get all assets in the database and return them
 module.exports.addAsset = (assetName) =>
 {
     // Select All from the Assets table (check database diagram) and return the result
     return dbConnection.query(`INSERT INTO Assets (asset_name) VALUES (${assetName})`)
     .catch((err) => Promise.reject(new DbOperationError(`Failed to select all assets\n\n:${err.stack}`)));
+};
+
+module.exports.deleteAsset = (assetId) =>
+{
+    // All sub-tables (AssetLocation, AssetPurchase, etc.) where asset_id is a foreign key should be
+    // defined with the ON DELETE CASCADE constraint, so that when an asset is deleted on the Assets
+    // table, all the rows on the sub-tables belonging to the same asset will also be deleted
+    return dbConnection.query(`DELETE FROM Assets WHERE asset_id = ${assetId}`)
+    .catch((err) => Promise.reject(new DbOperationError(`Failed to delete asset with id ${assetId}\n\n:${err.stack}`)));
+};
+
+module.exports.deleteAssets = (assetIds) =>
+{
+    // All sub-tables (AssetLocation, AssetPurchase, etc.) where asset_id is a foreign key should be
+    // defined with the ON DELETE CASCADE constraint, so that when an asset is deleted on the Assets
+    // table, all the rows on the sub-tables belonging to the same asset will also be deleted
+    return dbConnection.query(`DELETE FROM Assets WHERE asset_id IN (${assetIds.join(",")})`)
+    .catch((err) => Promise.reject(new DbOperationError(`Failed to delete assets with ids ${assetIds}\n\n:${err.stack}`)));
+};
+
+module.exports.deleteAllAssets = () =>
+{
+    // All sub-tables (AssetLocation, AssetPurchase, etc.) where asset_id is a foreign key should be
+    // defined with the ON DELETE CASCADE constraint, so that when an asset is deleted on the Assets
+    // table, all the rows on the sub-tables belonging to the same asset will also be deleted
+    return dbConnection.query(`DELETE FROM Assets`)
+    .catch((err) => Promise.reject(new DbOperationError(`Failed to delete all assets\n\n:${err.stack}`)));
 };
 
 // Get all assets in the database and return them
