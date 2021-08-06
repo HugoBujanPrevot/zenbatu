@@ -1,0 +1,19 @@
+
+
+[
+    {
+        "name": "Dubai Marina",
+        "locations": [
+            "1st Floor",
+            "2nd Floor",
+            "Basement"
+        ]
+    },
+    {
+        "name": "Manhattan",
+        "locations": [
+            "Newton Building",
+            "Galileo Building"
+        ]
+    }
+]

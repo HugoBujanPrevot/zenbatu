@@ -1,0 +1,15 @@
+
+[
+    {
+        "name": "MacBook Pro 13\"",
+        "brand": "Apple",
+        "model": "A2338",
+        "serial_no": "SN81274650",
+        "category_id": 1,
+        "site_id": 1,
+        "location_id": 1,
+        "purchase_date": "2020-06-25",
+        "cost": 1200,
+        "vendor": "Amazon"
+    }
+]
