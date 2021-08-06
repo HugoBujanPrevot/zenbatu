@@ -21,7 +21,10 @@ module.exports.createConnection = (hostIp, user, password) =>
     dbConnection = mysql.createConnection({
         host: hostIp,
         user: user,
-        password: password
+        password: password,
+        
+        // This is required to be able to make single queries with more than one statement in them
+        multipleStatements: true
     });
 };
 
