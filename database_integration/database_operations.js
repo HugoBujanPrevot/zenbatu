@@ -29,12 +29,97 @@ module.exports.connect = () =>
 };
 
 
-// Get all assets in the database and return them
-module.exports.addAsset = (assetName) =>
+// Add an asset to the database, with all the required fields
+module.exports.addAsset = (assetObj) =>
 {
-    // Select All from the Assets table (check database diagram) and return the result
-    return dbConnection.query(`INSERT INTO Assets (asset_name) VALUES (${assetName})`)
-    .catch((err) => Promise.reject(new DbOperationError(`Failed to select all assets\n\n:${err.stack}`)));
+    return dbConnection.query(
+        `INSERT INTO Assets (name) VALUES ('${assetObj.name}');\n` +
+        `SET @asset_id = LAST_INSERT_ID();\n` +
+        `INSERT INTO AssetLocation (asset_id, site_id, location_id) VALUES (@asset_id, '${assetObj.site_id}', '${assetObj.location_id}');\n` +
+        `INSERT INTO AssetType (asset_id, brand, model, serial_no, category_id) VALUES (@asset_id, '${assetObj.brand}', '${assetObj.model}', '${assetObj.serial_no}', '${assetObj.category_id}');\n` +
+        `INSERT INTO AssetPurchase (asset_id, purchase_date, cost, vendor) VALUES (@asset_id, '${assetObj.purchase_date}', '${assetObj.cost}', '${assetObj.vendor}');\n`
+    )
+    .catch((err) => Promise.reject(new DbOperationError(`Failed to add asset\n\n:${err.stack}`)));
+};
+
+// Add an array of assets to the database, with all the required fields
+module.exports.addAssets = (arrOfAssetObjects) =>
+{
+    var queryStr = "";
+
+    arrOfAssetObjects.forEach((assetObj, i) =>
+    {
+        queryStr += `\nINSERT INTO Assets (name) VALUES ('${assetObj.name}');\n` +
+        `SET @asset_id = LAST_INSERT_ID();\n` +
+        `INSERT INTO AssetLocation (asset_id, site_id, location_id) VALUES (@asset_id, '${assetObj.site_id}', '${assetObj.location_id}');\n` +
+        `INSERT INTO AssetType (asset_id, brand, model, serial_no, category_id) VALUES (@asset_id, '${assetObj.brand}', '${assetObj.model}', '${assetObj.serial_no}', '${assetObj.category_id}');\n` +
+        `INSERT INTO AssetPurchase (asset_id, purchase_date, cost, vendor) VALUES (@asset_id, '${assetObj.purchase_date}', '${assetObj.cost}', '${assetObj.vendor}');\n`
+    });
+
+    return dbConnection.query(queryStr)
+    .catch((err) => Promise.reject(new DbOperationError(`Failed to add assets\n\n:${err.stack}`)));
+};
+
+// Add asset categories to the database
+module.exports.addCategories = (arrOfCategoryObjects) =>
+{
+    var queryStr = "INSERT INTO Categories (name) VALUES ";
+
+    arrOfCategoryObjects.forEach((categoryObj, i) => 
+    {
+        if (i > 0) queryStr += ",";
+        queryStr += `('${categoryObj.name}')`;
+    });
+
+    return dbConnection.query(queryStr)
+    .catch((err) => Promise.reject(new DbOperationError(`Failed to add categories\n\n:${err.stack}`)));
+};
+
+// Add some new sites with some (or no) locations
+module.exports.addSites = (arrOfSiteObjects) =>
+{
+    var queryStr = "";
+
+    arrOfSiteObjects.forEach((siteObj) => 
+    {
+        queryStr += `INSERT INTO Sites (name) VALUES ('${siteObj.name}');\n` + 
+                    `SET @site_id = LAST_INSERT_ID();\n`;
+
+
+        siteObj.locations.forEach((locationName, i) =>
+        {
+            if (i === 0)    queryStr += `INSERT INTO Locations (site_id, name) VALUES `;
+            if (i > 0)      queryStr += `,`;
+            
+            queryStr += `\n(@site_id, '${locationName}')`;
+        });
+
+        queryStr += ";\n"
+    });
+
+    console.log(queryStr);
+    return dbConnection.query(queryStr)
+    .catch((err) => Promise.reject(new DbOperationError(`Failed to add sites\n\n:${err.stack}`)));
+};
+
+// Add a location to an existing site
+module.exports.addLocation = (siteId, locationName) =>
+{
+    return dbConnection.query(`INSERT INTO Locations (side_id, name) VALUES ('${siteId}', '${locationName}');`)
+    .catch((err) => Promise.reject(new DbOperationError(`Failed to add asset\n\n:${err.stack}`)));
+};
+
+// Fetch the list of tables of the used database
+module.exports.showTables = () =>
+{
+    return dbConnection.query(`SHOW TABLES;`)
+    .catch((err) => Promise.reject(new DbOperationError(`Failed to show tables\n\n:${err.stack}`)));
+};
+
+module.exports.showTableSchema = (tableName) =>
+{
+    return dbConnection.query(`DESCRIBE ${tableName};`)
+    .catch((err) => Promise.reject(new DbOperationError(`Failed to describe ${tableName}\n\n:${err.stack}`)));
 };
 
 module.exports.deleteAsset = (assetId) =>
@@ -89,5 +174,5 @@ module.exports.getAssetLocation = (assetId) =>
 
     // Select the asset with given id from the AssetLocation table and return it
     return dbConnection.query(`SELECT FROM AssetLocation WHERE asset_id=${assetId}`)
-    .catch((err) => Promise.reject(new DbOperationError(`Failed to select all assets\n\n:${err.stack}`)));
+    .catch((err) => Promise.reject(new DbOperationError(`Failed to get asset's location\n\n:${err.stack}`)));
 };
