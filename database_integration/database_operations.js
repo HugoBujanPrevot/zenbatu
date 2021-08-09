@@ -32,14 +32,7 @@ module.exports.connect = () =>
 // Add an asset to the database, with all the required fields
 module.exports.addAsset = (assetObj) =>
 {
-    return dbConnection.query(
-        `INSERT INTO Assets (name) VALUES ('${assetObj.name}');\n` +
-        `SET @asset_id = LAST_INSERT_ID();\n` +
-        `INSERT INTO AssetLocation (asset_id, site_id, location_id) VALUES (@asset_id, '${assetObj.site_id}', '${assetObj.location_id}');\n` +
-        `INSERT INTO AssetType (asset_id, brand, model, serial_no, category_id) VALUES (@asset_id, '${assetObj.brand}', '${assetObj.model}', '${assetObj.serial_no}', '${assetObj.category_id}');\n` +
-        `INSERT INTO AssetPurchase (asset_id, purchase_date, cost, vendor) VALUES (@asset_id, '${assetObj.purchase_date}', '${assetObj.cost}', '${assetObj.vendor}');\n`
-    )
-    .catch((err) => Promise.reject(new DbOperationError(`Failed to add asset\n\n:${err.stack}`)));
+    return exports.addAssets([ assetObj ]);
 };
 
 // Add an array of assets to the database, with all the required fields
