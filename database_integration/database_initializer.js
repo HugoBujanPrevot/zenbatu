@@ -1,25 +1,15 @@
 
-
+const dbSchema = require("../data/db_schema.json");
 const dbOperations = require("./database_operations");
 const DbOperationError = require("../errors/db_operation_error");
-
-const DB_NAME = "Zenbatu";
-const ASSET_TABLE = "Assets";
-const ASSET_LOCATION_TABLE = "AssetLocation";
-const ASSET_TYPE_TABLE = "AssetType";
-const ASSET_PURCHASE_TABLE = "AssetPurchase";
-const ASSET_MAINTENANCE_TABLE = "AssetMaintenance";
-const SITES_TABLE = "Sites";
-const LOCATIONS_TABLE = "Locations";
-const CATEGORIES_TABLE = "Categories";
 
 
 module.exports.initializeDb = (dbConnection) =>
 {
-    return _deleteDatabase(dbConnection, DB_NAME)
-    .then(() => _createDatabase(dbConnection, DB_NAME))
-    .then(() => _useDatabase(dbConnection, DB_NAME))
-    .then(() => _createTable(dbConnection, ASSET_TABLE, {
+    return _deleteDatabase(dbConnection, dbSchema.DB_NAME)
+    .then(() => _createDatabase(dbConnection, dbSchema.DB_NAME))
+    .then(() => _useDatabase(dbConnection, dbSchema.DB_NAME))
+    .then(() => _createTable(dbConnection, dbSchema.ASSET_TABLE, {
         asset_id: "INT AUTO_INCREMENT PRIMARY KEY",
         name: "CHAR(50) NOT NULL",
         added_date: "DATETIME DEFAULT CURRENT_TIMESTAMP",
@@ -27,91 +17,91 @@ module.exports.initializeDb = (dbConnection) =>
     }))
     .then((result) => 
     {
-        console.log(`${ASSET_TABLE} table created:\n\n`, result);
-        return _createTable(dbConnection, SITES_TABLE, {
+        console.log(`${dbSchema.ASSET_TABLE} table created:\n\n`, result);
+        return _createTable(dbConnection, dbSchema.SITES_TABLE, {
             site_id: "INT AUTO_INCREMENT PRIMARY KEY",
             name: "CHAR(50) NOT NULL"
         });
     })
     .then((result) => 
     {
-        console.log(`${SITES_TABLE} table created:\n\n`, result);
-        return _createTable(dbConnection, LOCATIONS_TABLE, {
+        console.log(`${dbSchema.SITES_TABLE} table created:\n\n`, result);
+        return _createTable(dbConnection, dbSchema.LOCATIONS_TABLE, {
             location_id: "INT AUTO_INCREMENT PRIMARY KEY",
             site_id: `INT NOT NULL`,
             name: "CHAR(50) NOT NULL",
             foreign_keys: [
-                `FOREIGN KEY (site_id) REFERENCES ${SITES_TABLE}(site_id)`,
+                `FOREIGN KEY (site_id) REFERENCES ${dbSchema.SITES_TABLE}(site_id)`,
             ]
         });
     })
     .then((result) => 
     {
-        console.log(`${LOCATIONS_TABLE} table created:\n\n`, result);
-        return _createTable(dbConnection, CATEGORIES_TABLE, {
+        console.log(`${dbSchema.LOCATIONS_TABLE} table created:\n\n`, result);
+        return _createTable(dbConnection, dbSchema.CATEGORIES_TABLE, {
             category_id: "INT AUTO_INCREMENT PRIMARY KEY",
             name: "CHAR(50) NOT NULL"
         });
     })
     .then((result) => 
     {
-        console.log(`${CATEGORIES_TABLE} table created:\n\n`, result);
-        return _createTable(dbConnection, ASSET_LOCATION_TABLE, {
+        console.log(`${dbSchema.CATEGORIES_TABLE} table created:\n\n`, result);
+        return _createTable(dbConnection, dbSchema.ASSET_LOCATION_TABLE, {
             asset_id: `INT NOT NULL PRIMARY KEY`,
             site_id: `INT NOT NULL`,
             location_id: `INT NOT NULL`,
             last_edit: "DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
             foreign_keys: [
-                `FOREIGN KEY (asset_id) REFERENCES ${ASSET_TABLE}(asset_id) ON DELETE CASCADE`,
-                `FOREIGN KEY (site_id) REFERENCES ${SITES_TABLE}(site_id)`,
-                `FOREIGN KEY (location_id) REFERENCES ${LOCATIONS_TABLE}(location_id)`
+                `FOREIGN KEY (asset_id) REFERENCES ${dbSchema.ASSET_TABLE}(asset_id) ON DELETE CASCADE`,
+                `FOREIGN KEY (site_id) REFERENCES ${dbSchema.SITES_TABLE}(site_id)`,
+                `FOREIGN KEY (location_id) REFERENCES ${dbSchema.LOCATIONS_TABLE}(location_id)`
             ]
         });
     })
     .then((result) => 
     {
-        console.log(`${ASSET_LOCATION_TABLE} table created:\n\n`, result);
-        return _createTable(dbConnection, ASSET_TYPE_TABLE, {
+        console.log(`${dbSchema.ASSET_LOCATION_TABLE} table created:\n\n`, result);
+        return _createTable(dbConnection, dbSchema.ASSET_TYPE_TABLE, {
             asset_id: `INT NOT NULL PRIMARY KEY`,
             brand: "CHAR(50) NOT NULL",
             model: "CHAR(100) NOT NULL",
             serial_no: "CHAR(50) NOT NULL",
             category_id: `INT`,
             foreign_keys: [
-                `FOREIGN KEY (asset_id) REFERENCES ${ASSET_TABLE}(asset_id) ON DELETE CASCADE`,
-                `FOREIGN KEY (category_id) REFERENCES ${CATEGORIES_TABLE}(category_id)`
+                `FOREIGN KEY (asset_id) REFERENCES ${dbSchema.ASSET_TABLE}(asset_id) ON DELETE CASCADE`,
+                `FOREIGN KEY (category_id) REFERENCES ${dbSchema.CATEGORIES_TABLE}(category_id)`
             ]
         });
     })
     .then((result) => 
     {
-        console.log(`${ASSET_TYPE_TABLE} table created:\n\n`, result);
-        return _createTable(dbConnection, ASSET_PURCHASE_TABLE, {
+        console.log(`${dbSchema.ASSET_TYPE_TABLE} table created:\n\n`, result);
+        return _createTable(dbConnection, dbSchema.ASSET_PURCHASE_TABLE, {
             asset_id: `INT NOT NULL PRIMARY KEY`,
             purchase_date: "DATE NOT NULL",
             cost: "DECIMAL(12, 2) NOT NULL",
             vendor: "CHAR(50) NOT NULL",
             foreign_keys: [
-                `FOREIGN KEY (asset_id) REFERENCES ${ASSET_TABLE}(asset_id) ON DELETE CASCADE`,
+                `FOREIGN KEY (asset_id) REFERENCES ${dbSchema.ASSET_TABLE}(asset_id) ON DELETE CASCADE`,
             ]
         })
     })
     .then((result) => 
     {
-        console.log(`${ASSET_PURCHASE_TABLE} table created:\n\n`, result);
-        return _createTable(dbConnection, ASSET_MAINTENANCE_TABLE, {
+        console.log(`${dbSchema.ASSET_PURCHASE_TABLE} table created:\n\n`, result);
+        return _createTable(dbConnection, dbSchema.ASSET_MAINTENANCE_TABLE, {
             asset_id: `INT NOT NULL PRIMARY KEY`,
             last_maintenance_date: "DATE",
             maintenance_schedule: "CHAR(100) NOT NULL",
             serial_no: "CHAR(50) NOT NULL",
             foreign_keys: [
-                `FOREIGN KEY (asset_id) REFERENCES ${ASSET_TABLE}(asset_id) ON DELETE CASCADE`,
+                `FOREIGN KEY (asset_id) REFERENCES ${dbSchema.ASSET_TABLE}(asset_id) ON DELETE CASCADE`,
             ]
         });
     })
     .then((result) => 
     {
-        console.log(`${ASSET_MAINTENANCE_TABLE} table created:\n\n`, result);
+        console.log(`${dbSchema.ASSET_MAINTENANCE_TABLE} table created:\n\n`, result);
         return _insertDummyData();
     })
     .catch((err) => 
