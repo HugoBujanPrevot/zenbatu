@@ -1,0 +1,12 @@
+{
+    "DB_NAME":  "Zenbatu",
+    
+    "ASSET_TABLE":  "Assets",
+    "ASSET_LOCATION_TABLE":  "AssetLocation",
+    "ASSET_TYPE_TABLE":  "AssetType",
+    "ASSET_PURCHASE_TABLE":  "AssetPurchase",
+    "ASSET_MAINTENANCE_TABLE":  "AssetMaintenance",
+    "SITES_TABLE":  "Sites",
+    "LOCATIONS_TABLE":  "Locations",
+    "CATEGORIES_TABLE":  "Categories"
+}
