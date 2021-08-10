@@ -12,6 +12,7 @@
  */
 
 
+const dbSchema = require("../data/db_schema.json");
 const dbConnection = require("./database_connection");
 const dbInitializer = require("./database_initializer");
 const DbOperationError = require("../errors/db_operation_error");
@@ -42,11 +43,11 @@ module.exports.addAssets = (arrOfAssetObjects) =>
 
     arrOfAssetObjects.forEach((assetObj, i) =>
     {
-        queryStr += `\nINSERT INTO Assets (name) VALUES ('${assetObj.name}');\n` +
+        queryStr += `\nINSERT INTO ${dbSchema.ASSET_TABLE} (name) VALUES ('${assetObj.name}');\n` +
         `SET @asset_id = LAST_INSERT_ID();\n` +
-        `INSERT INTO AssetLocation (asset_id, site_id, location_id) VALUES (@asset_id, '${assetObj.site_id}', '${assetObj.location_id}');\n` +
-        `INSERT INTO AssetType (asset_id, brand, model, serial_no, category_id) VALUES (@asset_id, '${assetObj.brand}', '${assetObj.model}', '${assetObj.serial_no}', '${assetObj.category_id}');\n` +
-        `INSERT INTO AssetPurchase (asset_id, purchase_date, cost, vendor) VALUES (@asset_id, '${assetObj.purchase_date}', '${assetObj.cost}', '${assetObj.vendor}');\n`
+        `INSERT INTO ${dbSchema.ASSET_LOCATION_TABLE} (asset_id, site_id, location_id) VALUES (@asset_id, '${assetObj.site_id}', '${assetObj.location_id}');\n` +
+        `INSERT INTO ${dbSchema.ASSET_TYPE_TABLE} (asset_id, brand, model, serial_no, category_id) VALUES (@asset_id, '${assetObj.brand}', '${assetObj.model}', '${assetObj.serial_no}', '${assetObj.category_id}');\n` +
+        `INSERT INTO ${dbSchema.ASSET_PURCHASE_TABLE} (asset_id, purchase_date, cost, vendor) VALUES (@asset_id, '${assetObj.purchase_date}', '${assetObj.cost}', '${assetObj.vendor}');\n`
     });
 
     return dbConnection.query(queryStr)
@@ -56,7 +57,7 @@ module.exports.addAssets = (arrOfAssetObjects) =>
 // Add asset categories to the database
 module.exports.addCategories = (arrOfCategoryObjects) =>
 {
-    var queryStr = "INSERT INTO Categories (name) VALUES ";
+    var queryStr = `INSERT INTO ${dbSchema.CATEGORIES_TABLE} (name) VALUES `;
 
     arrOfCategoryObjects.forEach((categoryObj, i) => 
     {
@@ -75,13 +76,13 @@ module.exports.addSites = (arrOfSiteObjects) =>
 
     arrOfSiteObjects.forEach((siteObj) => 
     {
-        queryStr += `INSERT INTO Sites (name) VALUES ('${siteObj.name}');\n` + 
+        queryStr += `INSERT INTO ${dbSchema.SITES_TABLE} (name) VALUES ('${siteObj.name}');\n` + 
                     `SET @site_id = LAST_INSERT_ID();\n`;
 
 
         siteObj.locations.forEach((locationName, i) =>
         {
-            if (i === 0)    queryStr += `INSERT INTO Locations (site_id, name) VALUES `;
+            if (i === 0)    queryStr += `INSERT INTO ${dbSchema.LOCATIONS_TABLE} (site_id, name) VALUES `;
             if (i > 0)      queryStr += `,`;
             
             queryStr += `\n(@site_id, '${locationName}')`;
@@ -98,7 +99,7 @@ module.exports.addSites = (arrOfSiteObjects) =>
 // Add a location to an existing site
 module.exports.addLocation = (siteId, locationName) =>
 {
-    return dbConnection.query(`INSERT INTO Locations (side_id, name) VALUES ('${siteId}', '${locationName}');`)
+    return dbConnection.query(`INSERT INTO ${dbSchema.LOCATIONS_TABLE} (site_id, name) VALUES ('${siteId}', '${locationName}');`)
     .catch((err) => Promise.reject(new DbOperationError(`Failed to add asset\n\n:${err.stack}`)));
 };
 
@@ -120,7 +121,7 @@ module.exports.deleteAsset = (assetId) =>
     // All sub-tables (AssetLocation, AssetPurchase, etc.) where asset_id is a foreign key should be
     // defined with the ON DELETE CASCADE constraint, so that when an asset is deleted on the Assets
     // table, all the rows on the sub-tables belonging to the same asset will also be deleted
-    return dbConnection.query(`DELETE FROM Assets WHERE asset_id = ${assetId}`)
+    return dbConnection.query(`DELETE FROM ${dbSchema.ASSET_TABLE} WHERE asset_id = ${assetId}`)
     .catch((err) => Promise.reject(new DbOperationError(`Failed to delete asset with id ${assetId}\n\n:${err.stack}`)));
 };
 
@@ -129,7 +130,7 @@ module.exports.deleteAssets = (assetIds) =>
     // All sub-tables (AssetLocation, AssetPurchase, etc.) where asset_id is a foreign key should be
     // defined with the ON DELETE CASCADE constraint, so that when an asset is deleted on the Assets
     // table, all the rows on the sub-tables belonging to the same asset will also be deleted
-    return dbConnection.query(`DELETE FROM Assets WHERE asset_id IN (${assetIds.join(",")})`)
+    return dbConnection.query(`DELETE FROM ${dbSchema.ASSET_TABLE} WHERE asset_id IN (${assetIds.join(",")})`)
     .catch((err) => Promise.reject(new DbOperationError(`Failed to delete assets with ids ${assetIds}\n\n:${err.stack}`)));
 };
 
@@ -138,7 +139,7 @@ module.exports.deleteAllAssets = () =>
     // All sub-tables (AssetLocation, AssetPurchase, etc.) where asset_id is a foreign key should be
     // defined with the ON DELETE CASCADE constraint, so that when an asset is deleted on the Assets
     // table, all the rows on the sub-tables belonging to the same asset will also be deleted
-    return dbConnection.query(`DELETE FROM Assets`)
+    return dbConnection.query(`DELETE FROM ${dbSchema.ASSET_TABLE}`)
     .catch((err) => Promise.reject(new DbOperationError(`Failed to delete all assets\n\n:${err.stack}`)));
 };
 
@@ -146,26 +147,50 @@ module.exports.deleteAllAssets = () =>
 module.exports.getAsset = (assetNameOrId) =>
 {
     // Select an asset from the Assets table (check database diagram) and return the result
-    return dbConnection.query(`SELECT * FROM Assets WHERE name = '${assetNameOrId}' OR asset_id = '${assetNameOrId}'`)
+    return dbConnection.query(`SELECT * FROM ${dbSchema.ASSET_TABLE} WHERE name = '${assetNameOrId}' OR asset_id = '${assetNameOrId}'`)
     .catch((err) => Promise.reject(new DbOperationError(`Failed to select the asset\n\n:${err.stack}`)));
 };
 
 // Get all assets in the database and return them
-module.exports.getAssets = () =>
+module.exports.getAllAssets = () =>
 {
     // Select All from the Assets table (check database diagram) and return the result
-    return dbConnection.query(`SELECT * FROM Assets`)
+    return dbConnection.query(`SELECT * FROM ${dbSchema.ASSET_TABLE}`)
     .catch((err) => Promise.reject(new DbOperationError(`Failed to select all assets\n\n:${err.stack}`)));
 };
 
-// Get all assets in the database and return them
+// Get the location data of a given asset
 module.exports.getAssetLocation = (assetId) =>
 {
     // Check that the given assetId (the asset's database id, to be clear) is indeed an integer
     if (Number.isInteger(assetId) === false)
         throw new TypeError(`Expected integer asset id, got '${assetId}' instead.`);
 
-    // Select the asset with given id from the AssetLocation table and return it
-    return dbConnection.query(`SELECT FROM AssetLocation WHERE asset_id=${assetId}`)
+    // Select the asset with given id from the AssetType table and return it
+    return dbConnection.query(`SELECT FROM ${dbSchema.ASSET_TYPE_TABLE} WHERE asset_id=${assetId}`)
+    .catch((err) => Promise.reject(new DbOperationError(`Failed to get asset's location\n\n:${err.stack}`)));
+};
+
+// Get the purchase data of a given asset
+module.exports.getAssetPurchase = (assetId) =>
+{
+    // Check that the given assetId (the asset's database id, to be clear) is indeed an integer
+    if (Number.isInteger(assetId) === false)
+        throw new TypeError(`Expected integer asset id, got '${assetId}' instead.`);
+
+    // Select the asset with given id from the AssetPurchase table and return it
+    return dbConnection.query(`SELECT FROM ${dbSchema.ASSET_PURCHASE_TABLE} WHERE asset_id=${assetId}`)
+    .catch((err) => Promise.reject(new DbOperationError(`Failed to get asset's location\n\n:${err.stack}`)));
+};
+
+// Get the maintenance data of a given asset
+module.exports.getAssetMaintenance = (assetId) =>
+{
+    // Check that the given assetId (the asset's database id, to be clear) is indeed an integer
+    if (Number.isInteger(assetId) === false)
+        throw new TypeError(`Expected integer asset id, got '${assetId}' instead.`);
+
+    // Select the asset with given id from the AssetMaintenance table and return it
+    return dbConnection.query(`SELECT FROM ${dbSchema.ASSET_MAINTENANCE_TABLE} WHERE asset_id=${assetId}`)
     .catch((err) => Promise.reject(new DbOperationError(`Failed to get asset's location\n\n:${err.stack}`)));
 };
