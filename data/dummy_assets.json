@@ -10,6 +10,7 @@
         "location_id": 1,
         "purchase_date": "2020-06-25",
         "cost": 1200,
-        "vendor": "Amazon"
+        "vendor": "Amazon",
+        "useful_life": 5
     }
 ]
