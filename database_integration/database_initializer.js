@@ -81,6 +81,7 @@ module.exports.initializeDb = (dbConnection) =>
             purchase_date: "DATE NOT NULL",
             cost: "DECIMAL(12, 2) NOT NULL",
             vendor: "CHAR(50) NOT NULL",
+            useful_life: "INT UNSIGNED",
             foreign_keys: [
                 `FOREIGN KEY (asset_id) REFERENCES ${dbSchema.ASSET_TABLE}(asset_id) ON DELETE CASCADE`,
             ]
@@ -93,7 +94,6 @@ module.exports.initializeDb = (dbConnection) =>
             asset_id: `INT NOT NULL PRIMARY KEY`,
             last_maintenance_date: "DATE",
             maintenance_schedule: "CHAR(100) NOT NULL",
-            serial_no: "CHAR(50) NOT NULL",
             foreign_keys: [
                 `FOREIGN KEY (asset_id) REFERENCES ${dbSchema.ASSET_TABLE}(asset_id) ON DELETE CASCADE`,
             ]
