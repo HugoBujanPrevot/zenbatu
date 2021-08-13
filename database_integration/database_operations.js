@@ -152,10 +152,23 @@ module.exports.getAsset = (assetNameOrId) =>
 };
 
 // Get all assets in the database and return them
-module.exports.getAllAssets = () =>
+module.exports.getAllAssetNames = () =>
 {
     // Select All from the Assets table (check database diagram) and return the result
     return dbConnection.query(`SELECT * FROM ${dbSchema.ASSET_TABLE}`)
+    .catch((err) => Promise.reject(new DbOperationError(`Failed to select all assets\n\n:${err.stack}`)));
+};
+
+// Get all assets in the database, along with all the data from all the asset tables, and return them
+module.exports.getFullAssets = () =>
+{
+    // Select All from the Assets table (check database diagram) and join it using the asset id with each of the tables
+    return dbConnection.query(
+        `SELECT * FROM ${dbSchema.ASSET_TABLE}` +
+        `INNER JOIN ${dbSchema.ASSET_LOCATION_TABLE} ON ${dbSchema.ASSET_TABLE}.asset_id = ${dbSchema.ASSET_LOCATION_TABLE}.asset_id` +
+        `INNER JOIN ${dbSchema.ASSET_PURCHASE_TABLE} ON ${dbSchema.ASSET_TABLE}.asset_id = ${dbSchema.ASSET_PURCHASE_TABLE}.asset_id` +
+        `INNER JOIN ${dbSchema.ASSET_MAINTENANCE_TABLE} ON ${dbSchema.ASSET_TABLE}.asset_id = ${dbSchema.ASSET_MAINTENANCE_TABLE}.asset_id;`
+    )
     .catch((err) => Promise.reject(new DbOperationError(`Failed to select all assets\n\n:${err.stack}`)));
 };
 
