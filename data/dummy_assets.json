@@ -12,5 +12,57 @@
         "cost": 1200,
         "vendor": "Amazon",
         "useful_life": 5
+    },
+    {
+        "name": "Acer Aspire 5 Slim Laptop",
+        "brand": "Acer",
+        "model": "A515-46-R14K",
+        "serial_no": "SN85785489",
+        "category_id": 1,
+        "site_id": 2,
+        "location_id": 2,
+        "purchase_date": "2020-08-12",
+        "cost": 399,
+        "vendor": "Amazon",
+        "useful_life": 5
+    },
+    {
+        "name": "HP EliteDesk 800",
+        "brand": "HP",
+        "model": "G1",
+        "serial_no": "SN3549875646",
+        "category_id": 2,
+        "site_id": 2,
+        "location_id": 1,
+        "purchase_date": "2020-12-11",
+        "cost": 499.99,
+        "vendor": "Amazon",
+        "useful_life": 5
+    },
+    {
+        "name": "Toyota Sprinter Trueno",
+        "brand": "Toyota",
+        "model": "AE86",
+        "serial_no": "SN86868686",
+        "category_id": 3,
+        "site_id": 1,
+        "location_id": 2,
+        "purchase_date": "2020-04-23",
+        "cost": 12000,
+        "vendor": "AutoTrader",
+        "useful_life": 10
+    },
+    {
+        "name": "Mazda RX-7 Twin-Turbo",
+        "brand": "Mazda",
+        "model": "RX-7 FD",
+        "serial_no": "SN54876521",
+        "category_id": 3,
+        "site_id": 1,
+        "location_id": 2,
+        "purchase_date": "2020-03-15",
+        "cost": 15000,
+        "vendor": "AutoTrader",
+        "useful_life": 10
     }
 ]
