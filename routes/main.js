@@ -1,4 +1,5 @@
 
+const reporter = require("../report_manager/reporter");
 const assetManager = require("../asset_manager/asset_manager");
 const dbOperations = require("../database_integration/database_operations");
 
@@ -20,6 +21,11 @@ module.exports.initRoutes = function (expressApp)
         // TODO: Do account checking on account manager
         Promise.resolve(dbOperations.createConnection(params.ip, params.user, params.password))
         .then(() => dbOperations.connect())
+        .then(() => 
+        {
+            console.log("Generating report");
+            reporter.generateReport().then(console.log);
+        })
         .then(() => response.render("index.ejs", { connected: true }))
         .catch((err) => response.render("index.ejs", { error: err.message }));
     });
