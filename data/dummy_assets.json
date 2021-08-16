@@ -11,7 +11,9 @@
         "purchase_date": "2020-06-25",
         "cost": 1200,
         "vendor": "Amazon",
-        "useful_life": 5
+        "useful_life": 5,
+        "last_maintenance_date": "2021-04-08",
+        "maintenance_schedule": "monthly"
     },
     {
         "name": "Acer Aspire 5 Slim Laptop",
@@ -24,7 +26,9 @@
         "purchase_date": "2020-08-12",
         "cost": 399,
         "vendor": "Amazon",
-        "useful_life": 5
+        "useful_life": 5,
+        "last_maintenance_date": "2021-06-08",
+        "maintenance_schedule": "quarterly"
     },
     {
         "name": "HP EliteDesk 800",
@@ -37,7 +41,9 @@
         "purchase_date": "2020-12-11",
         "cost": 499.99,
         "vendor": "Amazon",
-        "useful_life": 5
+        "useful_life": 5,
+        "last_maintenance_date": "2021-01-13",
+        "maintenance_schedule": "quarterly"
     },
     {
         "name": "Toyota Sprinter Trueno",
@@ -50,7 +56,9 @@
         "purchase_date": "2020-04-23",
         "cost": 12000,
         "vendor": "AutoTrader",
-        "useful_life": 10
+        "useful_life": 10,
+        "last_maintenance_date": "2021-08-08",
+        "maintenance_schedule": "biweekly"
     },
     {
         "name": "Mazda RX-7 Twin-Turbo",
@@ -63,6 +71,8 @@
         "purchase_date": "2020-03-15",
         "cost": 15000,
         "vendor": "AutoTrader",
-        "useful_life": 10
+        "useful_life": 10,
+        "last_maintenance_date": "2021-08-08",
+        "maintenance_schedule": "weekly"
     }
 ]
