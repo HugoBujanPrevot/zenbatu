@@ -92,8 +92,8 @@ module.exports.initializeDb = (dbConnection) =>
         console.log(`${dbSchema.ASSET_PURCHASE_TABLE} table created:\n\n`, result);
         return _createTable(dbConnection, dbSchema.ASSET_MAINTENANCE_TABLE, {
             asset_id: `INT NOT NULL PRIMARY KEY`,
-            last_maintenance_date: "DATE",
             maintenance_schedule: "CHAR(100) NOT NULL",
+            last_maintenance_date: "DATE",
             foreign_keys: [
                 `FOREIGN KEY (asset_id) REFERENCES ${dbSchema.ASSET_TABLE}(asset_id) ON DELETE CASCADE`,
             ]
