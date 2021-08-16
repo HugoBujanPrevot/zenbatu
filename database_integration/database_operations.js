@@ -47,7 +47,8 @@ module.exports.addAssets = (arrOfAssetObjects) =>
         `SET @asset_id = LAST_INSERT_ID();\n` +
         `INSERT INTO ${dbSchema.ASSET_LOCATION_TABLE} (asset_id, site_id, location_id) VALUES (@asset_id, '${assetObj.site_id}', '${assetObj.location_id}');\n` +
         `INSERT INTO ${dbSchema.ASSET_TYPE_TABLE} (asset_id, brand, model, serial_no, category_id) VALUES (@asset_id, '${assetObj.brand}', '${assetObj.model}', '${assetObj.serial_no}', '${assetObj.category_id}');\n` +
-        `INSERT INTO ${dbSchema.ASSET_PURCHASE_TABLE} (asset_id, purchase_date, cost, vendor) VALUES (@asset_id, '${assetObj.purchase_date}', '${assetObj.cost}', '${assetObj.vendor}');\n`
+        `INSERT INTO ${dbSchema.ASSET_PURCHASE_TABLE} (asset_id, purchase_date, cost, vendor, useful_life) VALUES (@asset_id, '${assetObj.purchase_date}', '${assetObj.cost}', '${assetObj.vendor}', '${assetObj.useful_life}');\n` +
+        `INSERT INTO ${dbSchema.ASSET_MAINTENANCE_TABLE} (asset_id, maintenance_schedule, last_maintenance_date) VALUES (@asset_id, '${assetObj.maintenance_schedule}', '${assetObj.last_maintenance_date}');\n`
     });
 
     return dbConnection.query(queryStr)
@@ -156,7 +157,7 @@ module.exports.getAllAssetNames = () =>
 {
     // Select All from the Assets table (check database diagram) and return the result
     return dbConnection.query(`SELECT * FROM ${dbSchema.ASSET_TABLE}`)
-    .catch((err) => Promise.reject(new DbOperationError(`Failed to select all assets\n\n:${err.stack}`)));
+    .catch((err) => Promise.reject(new DbOperationError(`Failed to select all asset names\n\n:${err.stack}`)));
 };
 
 // Get all assets in the database, along with all the data from all the asset tables, and return them
@@ -164,9 +165,10 @@ module.exports.getFullAssets = () =>
 {
     // Select All from the Assets table (check database diagram) and join it using the asset id with each of the tables
     return dbConnection.query(
-        `SELECT * FROM ${dbSchema.ASSET_TABLE}` +
-        `INNER JOIN ${dbSchema.ASSET_LOCATION_TABLE} ON ${dbSchema.ASSET_TABLE}.asset_id = ${dbSchema.ASSET_LOCATION_TABLE}.asset_id` +
-        `INNER JOIN ${dbSchema.ASSET_PURCHASE_TABLE} ON ${dbSchema.ASSET_TABLE}.asset_id = ${dbSchema.ASSET_PURCHASE_TABLE}.asset_id` +
+        `SELECT * FROM ${dbSchema.ASSET_TABLE}\n` +
+        `INNER JOIN ${dbSchema.ASSET_LOCATION_TABLE} ON ${dbSchema.ASSET_TABLE}.asset_id = ${dbSchema.ASSET_LOCATION_TABLE}.asset_id\n` +
+        `INNER JOIN ${dbSchema.ASSET_TYPE_TABLE} ON ${dbSchema.ASSET_TABLE}.asset_id = ${dbSchema.ASSET_TYPE_TABLE}.asset_id\n` +
+        `INNER JOIN ${dbSchema.ASSET_PURCHASE_TABLE} ON ${dbSchema.ASSET_TABLE}.asset_id = ${dbSchema.ASSET_PURCHASE_TABLE}.asset_id\n` +
         `INNER JOIN ${dbSchema.ASSET_MAINTENANCE_TABLE} ON ${dbSchema.ASSET_TABLE}.asset_id = ${dbSchema.ASSET_MAINTENANCE_TABLE}.asset_id;`
     )
     .catch((err) => Promise.reject(new DbOperationError(`Failed to select all assets\n\n:${err.stack}`)));
@@ -179,9 +181,21 @@ module.exports.getAssetLocation = (assetId) =>
     if (Number.isInteger(assetId) === false)
         throw new TypeError(`Expected integer asset id, got '${assetId}' instead.`);
 
+    // Select the asset with given id from the AssetLocation table and return it
+    return dbConnection.query(`SELECT * FROM ${dbSchema.ASSET_LOCATION_TABLE} WHERE asset_id=${assetId}`)
+    .catch((err) => Promise.reject(new DbOperationError(`Failed to get asset's location data\n\n:${err.stack}`)));
+};
+
+// Get the type data of a given asset
+module.exports.getAssetType = (assetId) =>
+{
+    // Check that the given assetId (the asset's database id, to be clear) is indeed an integer
+    if (Number.isInteger(assetId) === false)
+        throw new TypeError(`Expected integer asset id, got '${assetId}' instead.`);
+
     // Select the asset with given id from the AssetType table and return it
-    return dbConnection.query(`SELECT FROM ${dbSchema.ASSET_TYPE_TABLE} WHERE asset_id=${assetId}`)
-    .catch((err) => Promise.reject(new DbOperationError(`Failed to get asset's location\n\n:${err.stack}`)));
+    return dbConnection.query(`SELECT * FROM ${dbSchema.ASSET_TYPE_TABLE} WHERE asset_id=${assetId}`)
+    .catch((err) => Promise.reject(new DbOperationError(`Failed to get asset's type data\n\n:${err.stack}`)));
 };
 
 // Get the purchase data of a given asset
@@ -192,8 +206,8 @@ module.exports.getAssetPurchase = (assetId) =>
         throw new TypeError(`Expected integer asset id, got '${assetId}' instead.`);
 
     // Select the asset with given id from the AssetPurchase table and return it
-    return dbConnection.query(`SELECT FROM ${dbSchema.ASSET_PURCHASE_TABLE} WHERE asset_id=${assetId}`)
-    .catch((err) => Promise.reject(new DbOperationError(`Failed to get asset's location\n\n:${err.stack}`)));
+    return dbConnection.query(`SELECT * FROM ${dbSchema.ASSET_PURCHASE_TABLE} WHERE asset_id=${assetId}`)
+    .catch((err) => Promise.reject(new DbOperationError(`Failed to get asset's purchase data\n\n:${err.stack}`)));
 };
 
 // Get the maintenance data of a given asset
@@ -204,6 +218,6 @@ module.exports.getAssetMaintenance = (assetId) =>
         throw new TypeError(`Expected integer asset id, got '${assetId}' instead.`);
 
     // Select the asset with given id from the AssetMaintenance table and return it
-    return dbConnection.query(`SELECT FROM ${dbSchema.ASSET_MAINTENANCE_TABLE} WHERE asset_id=${assetId}`)
-    .catch((err) => Promise.reject(new DbOperationError(`Failed to get asset's location\n\n:${err.stack}`)));
+    return dbConnection.query(`SELECT * FROM ${dbSchema.ASSET_MAINTENANCE_TABLE} WHERE asset_id=${assetId}`)
+    .catch((err) => Promise.reject(new DbOperationError(`Failed to get asset's maintenance data\n\n:${err.stack}`)));
 };
