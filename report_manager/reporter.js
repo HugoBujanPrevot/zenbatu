@@ -14,21 +14,32 @@ const DAYS_IN_YEAR = 365;
 // the asset has exceeded its useful life
 module.exports.generateReport = async function()
 {
-    const assets = dbOperations.getFullAssets();
-    const report = [];
-
-    assets.forEach((asset) =>
+    try
     {
-        const assetReport = {
-            needsMaintenance:       _doesAssetNeedMaintenance(asset),
-            currentValue:           _getCurrentAssetValue(asset),
-            hasExceededLifespan:    _hasAssetExceededLifespan(asset)
-        };
+        const assets = await dbOperations.getFullAssets();
+        const report = [];
 
-        report.push(assetReport);
-    });
+        console.log(assets);
 
-    return report;
+        assets.forEach((asset) =>
+        {
+            const assetReport = {
+                needsMaintenance:       _doesAssetNeedMaintenance(asset),
+                currentValue:           _getCurrentAssetValue(asset),
+                hasExceededLifespan:    _hasAssetExceededLifespan(asset)
+            };
+
+            report.push(assetReport);
+        });
+
+        return report;
+    }
+
+    catch(err)
+    {
+        console.log(err);
+    }
+    
 };
 
 
@@ -37,9 +48,10 @@ function _getDaysSinceLastMaintenance(asset)
 {
     const now = Date.now();
     const lastMaintenanceDate = new Date(asset.last_maintenance_date);
-    console.log(`Asset ${asset.name}'s last maintenance date is ${lastMaintenanceDate}`);
+    console.log(`Asset ${asset.name}'s last maintenance date is ${lastMaintenanceDate}, or ${lastMaintenanceDate.getTime()}ms`);
 
-    const msSinceMaintenance = now - lastMaintenanceDate.getMilliseconds();
+    const msSinceMaintenance = now - lastMaintenanceDate.getTime();
+    console.log(`Asset ${asset.name}'s ms since last maintenance date is ${msSinceMaintenance}`);
     const daysSinceMaintenance = Math.floor(msSinceMaintenance / MS_IN_DAY);
     console.log(`Asset ${asset.name}'s days since last maintenance date are ${daysSinceMaintenance}`);
 
@@ -51,8 +63,11 @@ function _getDaysSinceLastMaintenance(asset)
 function _getDaysSincePurchase(asset)
 {
     const now = Date.now();
+    console.log(`Now time is ${now}`);
     const purchaseDate = new Date(asset.purchase_date);
-    const msSincePurchase = now - purchaseDate.getMilliseconds();
+    console.log(`Asset ${asset.name}'s purchase date is ${purchaseDate}, or ${purchaseDate.getTime()}ms`);
+    const msSincePurchase = now - purchaseDate.getTime();
+    console.log(`Ms since purchase are ${msSincePurchase}`);
     const daysSincePurchase = Math.floor(msSincePurchase / MS_IN_DAY);
     console.log(`Asset ${asset.name}'s days since purchase are ${daysSincePurchase}`);
 
@@ -73,7 +88,7 @@ function _getCurrentAssetValue(asset)
         return 0;
         
     // Work out the asset's daily value decay rate based on its lifespan and original cost
-    const dailyDecay = cost / usefulLifeInDays;
+    const dailyDecay = purchaseValue / usefulLifeInDays;
     console.log(`Asset ${asset.name}'s daily value decay is ${dailyDecay}`);
 
     // Work out the days that have passed since the purchase of the asset
@@ -81,7 +96,7 @@ function _getCurrentAssetValue(asset)
 
     // Work out the current value taking into account the original cost, the daily decay
     // in price and the days since the purchase was made
-    const currentValue = purchaseValue - ( dailyDecay * daysSincePurchase );
+    const currentValue = (purchaseValue - ( dailyDecay * daysSincePurchase )).toFixed(2);
     console.log(`Asset ${asset.name}'s current value is ${currentValue}`);
 
     return currentValue;
