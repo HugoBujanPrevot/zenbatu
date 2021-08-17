@@ -3,24 +3,23 @@ const dbSchema = require("../data/db_schema.json");
 const dbOperations = require("./database_operations");
 const DbOperationError = require("../errors/db_operation_error");
 
-
 module.exports.initializeDb = (dbConnection) =>
 {
     return _deleteDatabase(dbConnection, dbSchema.DB_NAME)
     .then(() => _createDatabase(dbConnection, dbSchema.DB_NAME))
     .then(() => _useDatabase(dbConnection, dbSchema.DB_NAME))
     .then(() => _createTable(dbConnection, dbSchema.ASSET_TABLE, {
-        asset_id: "INT AUTO_INCREMENT PRIMARY KEY",
-        name: "CHAR(50) NOT NULL",
+        asset_id: "CHAR(36) NOT NULL PRIMARY KEY",
+        name: "VARCHAR(50) NOT NULL",
         added_date: "DATETIME DEFAULT CURRENT_TIMESTAMP",
-        added_by: "CHAR(50) DEFAULT 'Admin'"
+        added_by: "VARCHAR(50) DEFAULT 'Admin'"
     }))
     .then((result) => 
     {
         console.log(`${dbSchema.ASSET_TABLE} table created:\n\n`, result);
         return _createTable(dbConnection, dbSchema.SITES_TABLE, {
             site_id: "INT AUTO_INCREMENT PRIMARY KEY",
-            name: "CHAR(50) NOT NULL"
+            name: "VARCHAR(50) NOT NULL"
         });
     })
     .then((result) => 
@@ -29,7 +28,7 @@ module.exports.initializeDb = (dbConnection) =>
         return _createTable(dbConnection, dbSchema.LOCATIONS_TABLE, {
             location_id: "INT AUTO_INCREMENT PRIMARY KEY",
             site_id: `INT NOT NULL`,
-            name: "CHAR(50) NOT NULL",
+            name: "VARCHAR(50) NOT NULL",
             foreign_keys: [
                 `FOREIGN KEY (site_id) REFERENCES ${dbSchema.SITES_TABLE}(site_id)`,
             ]
@@ -40,14 +39,14 @@ module.exports.initializeDb = (dbConnection) =>
         console.log(`${dbSchema.LOCATIONS_TABLE} table created:\n\n`, result);
         return _createTable(dbConnection, dbSchema.CATEGORIES_TABLE, {
             category_id: "INT AUTO_INCREMENT PRIMARY KEY",
-            name: "CHAR(50) NOT NULL"
+            name: "VARCHAR(50) NOT NULL"
         });
     })
     .then((result) => 
     {
         console.log(`${dbSchema.CATEGORIES_TABLE} table created:\n\n`, result);
         return _createTable(dbConnection, dbSchema.ASSET_LOCATION_TABLE, {
-            asset_id: `INT NOT NULL PRIMARY KEY`,
+            asset_id: `CHAR(36) NOT NULL PRIMARY KEY`,
             site_id: `INT NOT NULL`,
             location_id: `INT NOT NULL`,
             last_edit: "DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
@@ -62,10 +61,10 @@ module.exports.initializeDb = (dbConnection) =>
     {
         console.log(`${dbSchema.ASSET_LOCATION_TABLE} table created:\n\n`, result);
         return _createTable(dbConnection, dbSchema.ASSET_TYPE_TABLE, {
-            asset_id: `INT NOT NULL PRIMARY KEY`,
-            brand: "CHAR(50) NOT NULL",
-            model: "CHAR(100) NOT NULL",
-            serial_no: "CHAR(50) NOT NULL",
+            asset_id: `CHAR(36) NOT NULL PRIMARY KEY`,
+            brand: "VARCHAR(50) NOT NULL",
+            model: "VARCHAR(100) NOT NULL",
+            serial_no: "VARCHAR(50) NOT NULL",
             category_id: `INT`,
             foreign_keys: [
                 `FOREIGN KEY (asset_id) REFERENCES ${dbSchema.ASSET_TABLE}(asset_id) ON DELETE CASCADE`,
@@ -77,10 +76,10 @@ module.exports.initializeDb = (dbConnection) =>
     {
         console.log(`${dbSchema.ASSET_TYPE_TABLE} table created:\n\n`, result);
         return _createTable(dbConnection, dbSchema.ASSET_PURCHASE_TABLE, {
-            asset_id: `INT NOT NULL PRIMARY KEY`,
+            asset_id: `CHAR(36) NOT NULL PRIMARY KEY`,
             purchase_date: "DATE NOT NULL",
             cost: "DECIMAL(12, 2) NOT NULL",
-            vendor: "CHAR(50) NOT NULL",
+            vendor: "VARCHAR(50) NOT NULL",
             useful_life: "INT UNSIGNED",
             foreign_keys: [
                 `FOREIGN KEY (asset_id) REFERENCES ${dbSchema.ASSET_TABLE}(asset_id) ON DELETE CASCADE`,
@@ -91,8 +90,8 @@ module.exports.initializeDb = (dbConnection) =>
     {
         console.log(`${dbSchema.ASSET_PURCHASE_TABLE} table created:\n\n`, result);
         return _createTable(dbConnection, dbSchema.ASSET_MAINTENANCE_TABLE, {
-            asset_id: `INT NOT NULL PRIMARY KEY`,
-            maintenance_schedule: "CHAR(100) NOT NULL",
+            asset_id: `CHAR(36) NOT NULL PRIMARY KEY`,
+            maintenance_schedule: "VARCHAR(100) NOT NULL",
             last_maintenance_date: "DATE",
             foreign_keys: [
                 `FOREIGN KEY (asset_id) REFERENCES ${dbSchema.ASSET_TABLE}(asset_id) ON DELETE CASCADE`,
