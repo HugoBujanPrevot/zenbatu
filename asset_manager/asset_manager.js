@@ -2,9 +2,9 @@
 const dbOperations = require("../database_integration/database_operations");
 
 
-module.exports.addAsset = (assetName) =>
+module.exports.addAsset = (assetData) =>
 {
-    return dbOperations.addAsset(assetName)
+    return dbOperations.addAsset(assetData)
     .catch((err) =>
     {
         console.log(err);
