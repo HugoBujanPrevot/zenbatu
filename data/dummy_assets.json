@@ -1,6 +1,7 @@
 
 [
     {
+        "asset_id": "ace28258-b1de-4fdd-bf5b-dbcaa69a162a",
         "name": "MacBook Pro 13\"",
         "brand": "Apple",
         "model": "A2338",
@@ -16,6 +17,7 @@
         "maintenance_schedule": "monthly"
     },
     {
+        "asset_id": "d9afe524-ab40-4166-943c-ef2e615751b9",
         "name": "Acer Aspire 5 Slim Laptop",
         "brand": "Acer",
         "model": "A515-46-R14K",
@@ -31,6 +33,7 @@
         "maintenance_schedule": "quarterly"
     },
     {
+        "asset_id": "98874cdc-c765-438f-979f-b4a7e0c04a32",
         "name": "HP EliteDesk 800",
         "brand": "HP",
         "model": "G1",
@@ -46,6 +49,7 @@
         "maintenance_schedule": "quarterly"
     },
     {
+        "asset_id": "b13b1dd7-56fb-4e42-a017-37f062ad3e0a",
         "name": "Toyota Sprinter Trueno",
         "brand": "Toyota",
         "model": "AE86",
@@ -61,6 +65,7 @@
         "maintenance_schedule": "biweekly"
     },
     {
+        "asset_id": "43fdf812-fffd-4c83-bddf-02e6285baa62",
         "name": "Mazda RX-7 Twin-Turbo",
         "brand": "Mazda",
         "model": "RX-7 FD",
