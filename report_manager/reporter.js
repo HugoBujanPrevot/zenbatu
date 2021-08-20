@@ -48,12 +48,12 @@ function _getDaysSinceLastMaintenance(asset)
 {
     const now = Date.now();
     const lastMaintenanceDate = new Date(asset.last_maintenance_date);
-    console.log(`Asset ${asset.name}'s last maintenance date is ${lastMaintenanceDate}, or ${lastMaintenanceDate.getTime()}ms`);
+    console.log(`Asset ${asset.asset_name}'s last maintenance date is ${lastMaintenanceDate}, or ${lastMaintenanceDate.getTime()}ms`);
 
     const msSinceMaintenance = now - lastMaintenanceDate.getTime();
-    console.log(`Asset ${asset.name}'s ms since last maintenance date is ${msSinceMaintenance}`);
+    console.log(`Asset ${asset.asset_name}'s ms since last maintenance date is ${msSinceMaintenance}`);
     const daysSinceMaintenance = Math.floor(msSinceMaintenance / MS_IN_DAY);
-    console.log(`Asset ${asset.name}'s days since last maintenance date are ${daysSinceMaintenance}`);
+    console.log(`Asset ${asset.asset_name}'s days since last maintenance date are ${daysSinceMaintenance}`);
 
 
     return daysSinceMaintenance;
@@ -65,11 +65,11 @@ function _getDaysSincePurchase(asset)
     const now = Date.now();
     console.log(`Now time is ${now}`);
     const purchaseDate = new Date(asset.purchase_date);
-    console.log(`Asset ${asset.name}'s purchase date is ${purchaseDate}, or ${purchaseDate.getTime()}ms`);
+    console.log(`Asset ${asset.asset_name}'s purchase date is ${purchaseDate}, or ${purchaseDate.getTime()}ms`);
     const msSincePurchase = now - purchaseDate.getTime();
     console.log(`Ms since purchase are ${msSincePurchase}`);
     const daysSincePurchase = Math.floor(msSincePurchase / MS_IN_DAY);
-    console.log(`Asset ${asset.name}'s days since purchase are ${daysSincePurchase}`);
+    console.log(`Asset ${asset.asset_name}'s days since purchase are ${daysSincePurchase}`);
 
     return daysSincePurchase;
 }
@@ -89,7 +89,7 @@ function _getCurrentAssetValue(asset)
         
     // Work out the asset's daily value decay rate based on its lifespan and original cost
     const dailyDecay = purchaseValue / usefulLifeInDays;
-    console.log(`Asset ${asset.name}'s daily value decay is ${dailyDecay}`);
+    console.log(`Asset ${asset.asset_name}'s daily value decay is ${dailyDecay}`);
 
     // Work out the days that have passed since the purchase of the asset
     const daysSincePurchase = _getDaysSincePurchase(asset);
@@ -97,7 +97,7 @@ function _getCurrentAssetValue(asset)
     // Work out the current value taking into account the original cost, the daily decay
     // in price and the days since the purchase was made
     const currentValue = (purchaseValue - ( dailyDecay * daysSincePurchase )).toFixed(2);
-    console.log(`Asset ${asset.name}'s current value is ${currentValue}`);
+    console.log(`Asset ${asset.asset_name}'s current value is ${currentValue}`);
 
     return currentValue;
 }
@@ -109,7 +109,7 @@ function _hasAssetExceededLifespan(asset)
 {
     const daysSincePurchase = _getDaysSincePurchase(asset);
     const yearsSincePurchase = Math.floor(daysSincePurchase / DAYS_IN_YEAR);
-    console.log(`Asset ${asset.name}'s years since purchase are ${yearsSincePurchase}`);
+    console.log(`Asset ${asset.asset_name}'s years since purchase are ${yearsSincePurchase}`);
 
     if (yearsSincePurchase > asset.useful_life)
         return true;

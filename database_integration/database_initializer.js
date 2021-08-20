@@ -10,7 +10,7 @@ module.exports.initializeDb = (dbConnection) =>
     .then(() => _useDatabase(dbConnection, dbSchema.DB_NAME))
     .then(() => _createTable(dbConnection, dbSchema.ASSET_TABLE, {
         asset_id: "CHAR(36) NOT NULL PRIMARY KEY",
-        name: "VARCHAR(50) NOT NULL",
+        asset_name: "VARCHAR(50) NOT NULL",
         added_date: "DATETIME DEFAULT CURRENT_TIMESTAMP",
         added_by: "VARCHAR(50) DEFAULT 'Admin'"
     }))
@@ -19,7 +19,7 @@ module.exports.initializeDb = (dbConnection) =>
         console.log(`${dbSchema.ASSET_TABLE} table created:\n\n`, result);
         return _createTable(dbConnection, dbSchema.SITES_TABLE, {
             site_id: "INT AUTO_INCREMENT PRIMARY KEY",
-            name: "VARCHAR(50) NOT NULL"
+            site_name: "VARCHAR(50) NOT NULL"
         });
     })
     .then((result) => 
@@ -28,7 +28,7 @@ module.exports.initializeDb = (dbConnection) =>
         return _createTable(dbConnection, dbSchema.LOCATIONS_TABLE, {
             location_id: "INT AUTO_INCREMENT PRIMARY KEY",
             site_id: `INT NOT NULL`,
-            name: "VARCHAR(50) NOT NULL",
+            location_name: "VARCHAR(50) NOT NULL",
             foreign_keys: [
                 `FOREIGN KEY (site_id) REFERENCES ${dbSchema.SITES_TABLE}(site_id)`,
             ]
@@ -39,7 +39,7 @@ module.exports.initializeDb = (dbConnection) =>
         console.log(`${dbSchema.LOCATIONS_TABLE} table created:\n\n`, result);
         return _createTable(dbConnection, dbSchema.CATEGORIES_TABLE, {
             category_id: "INT AUTO_INCREMENT PRIMARY KEY",
-            name: "VARCHAR(50) NOT NULL"
+            category_name: "VARCHAR(50) NOT NULL"
         });
     })
     .then((result) => 

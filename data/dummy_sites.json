@@ -2,7 +2,7 @@
 
 [
     {
-        "name": "Dubai Marina",
+        "site_name": "Dubai Marina",
         "locations": [
             "1st Floor",
             "2nd Floor",
@@ -10,7 +10,7 @@
         ]
     },
     {
-        "name": "Manhattan",
+        "site_name": "Manhattan",
         "locations": [
             "Newton Building",
             "Galileo Building"

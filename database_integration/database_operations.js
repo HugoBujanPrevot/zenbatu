@@ -43,7 +43,7 @@ module.exports.addAssets = (arrOfAssetObjects) =>
 
     arrOfAssetObjects.forEach((assetObj, i) =>
     {
-        queryStr += `\nINSERT INTO ${dbSchema.ASSET_TABLE} (asset_id, name) VALUES ('${assetObj.asset_id}', '${assetObj.name}');\n` +
+        queryStr += `\nINSERT INTO ${dbSchema.ASSET_TABLE} (asset_id, asset_name) VALUES ('${assetObj.asset_id}', '${assetObj.asset_name}');\n` +
         `INSERT INTO ${dbSchema.ASSET_LOCATION_TABLE} (asset_id, site_id, location_id) VALUES ('${assetObj.asset_id}', '${assetObj.site_id}', '${assetObj.location_id}');\n` +
         `INSERT INTO ${dbSchema.ASSET_TYPE_TABLE} (asset_id, brand, model, serial_no, category_id) VALUES ('${assetObj.asset_id}', '${assetObj.brand}', '${assetObj.model}', '${assetObj.serial_no}', '${assetObj.category_id}');\n` +
         `INSERT INTO ${dbSchema.ASSET_PURCHASE_TABLE} (asset_id, purchase_date, cost, vendor, useful_life) VALUES ('${assetObj.asset_id}', '${assetObj.purchase_date}', '${assetObj.cost}', '${assetObj.vendor}', '${assetObj.useful_life}');\n` +
@@ -57,12 +57,12 @@ module.exports.addAssets = (arrOfAssetObjects) =>
 // Add asset categories to the database
 module.exports.addCategories = (arrOfCategoryObjects) =>
 {
-    var queryStr = `INSERT INTO ${dbSchema.CATEGORIES_TABLE} (name) VALUES `;
+    var queryStr = `INSERT INTO ${dbSchema.CATEGORIES_TABLE} (category_name) VALUES `;
 
     arrOfCategoryObjects.forEach((categoryObj, i) => 
     {
         if (i > 0) queryStr += ",";
-        queryStr += `('${categoryObj.name}')`;
+        queryStr += `('${categoryObj.category_name}')`;
     });
 
     return dbConnection.query(queryStr)
@@ -76,13 +76,13 @@ module.exports.addSites = (arrOfSiteObjects) =>
 
     arrOfSiteObjects.forEach((siteObj) => 
     {
-        queryStr += `INSERT INTO ${dbSchema.SITES_TABLE} (name) VALUES ('${siteObj.name}');\n` + 
+        queryStr += `INSERT INTO ${dbSchema.SITES_TABLE} (site_name) VALUES ('${siteObj.site_name}');\n` + 
                     `SET @site_id = LAST_INSERT_ID();\n`;
 
 
         siteObj.locations.forEach((locationName, i) =>
         {
-            if (i === 0)    queryStr += `INSERT INTO ${dbSchema.LOCATIONS_TABLE} (site_id, name) VALUES `;
+            if (i === 0)    queryStr += `INSERT INTO ${dbSchema.LOCATIONS_TABLE} (site_id, location_name) VALUES `;
             if (i > 0)      queryStr += `,`;
             
             queryStr += `\n(@site_id, '${locationName}')`;
@@ -99,7 +99,7 @@ module.exports.addSites = (arrOfSiteObjects) =>
 // Add a location to an existing site
 module.exports.addLocation = (siteId, locationName) =>
 {
-    return dbConnection.query(`INSERT INTO ${dbSchema.LOCATIONS_TABLE} (site_id, name) VALUES ('${siteId}', '${locationName}');`)
+    return dbConnection.query(`INSERT INTO ${dbSchema.LOCATIONS_TABLE} (site_id, location_name) VALUES ('${siteId}', '${locationName}');`)
     .catch((err) => Promise.reject(new DbOperationError(`Failed to add asset\n\n:${err.stack}`)));
 };
 
@@ -147,7 +147,7 @@ module.exports.deleteAllAssets = () =>
 module.exports.getAsset = (assetNameOrId) =>
 {
     // Select an asset from the Assets table (check database diagram) and return the result
-    return dbConnection.query(`SELECT * FROM ${dbSchema.ASSET_TABLE} WHERE name = '${assetNameOrId}' OR asset_id = '${assetNameOrId}'`)
+    return dbConnection.query(`SELECT * FROM ${dbSchema.ASSET_TABLE} WHERE asset_name = '${assetNameOrId}' OR asset_id = '${assetNameOrId}'`)
     .catch((err) => Promise.reject(new DbOperationError(`Failed to select the asset\n\n:${err.stack}`)));
 };
 
@@ -166,7 +166,10 @@ module.exports.getFullAssets = () =>
     return dbConnection.query(
         `SELECT * FROM ${dbSchema.ASSET_TABLE}\n` +
         `INNER JOIN ${dbSchema.ASSET_LOCATION_TABLE} ON ${dbSchema.ASSET_TABLE}.asset_id = ${dbSchema.ASSET_LOCATION_TABLE}.asset_id\n` +
+        `INNER JOIN ${dbSchema.SITES_TABLE} ON ${dbSchema.ASSET_LOCATION_TABLE}.site_id = ${dbSchema.SITES_TABLE}.site_id\n` +
+        `INNER JOIN ${dbSchema.LOCATIONS_TABLE} ON ${dbSchema.ASSET_LOCATION_TABLE}.location_id = ${dbSchema.LOCATIONS_TABLE}.location_id\n` +
         `INNER JOIN ${dbSchema.ASSET_TYPE_TABLE} ON ${dbSchema.ASSET_TABLE}.asset_id = ${dbSchema.ASSET_TYPE_TABLE}.asset_id\n` +
+        `INNER JOIN ${dbSchema.CATEGORIES_TABLE} ON ${dbSchema.ASSET_TYPE_TABLE}.category_id = ${dbSchema.CATEGORIES_TABLE}.category_id\n` +
         `INNER JOIN ${dbSchema.ASSET_PURCHASE_TABLE} ON ${dbSchema.ASSET_TABLE}.asset_id = ${dbSchema.ASSET_PURCHASE_TABLE}.asset_id\n` +
         `INNER JOIN ${dbSchema.ASSET_MAINTENANCE_TABLE} ON ${dbSchema.ASSET_TABLE}.asset_id = ${dbSchema.ASSET_MAINTENANCE_TABLE}.asset_id;`
     )
@@ -181,7 +184,11 @@ module.exports.getAssetLocation = (assetId) =>
         throw new TypeError(`Expected integer asset id, got '${assetId}' instead.`);
 
     // Select the asset with given id from the AssetLocation table and return it
-    return dbConnection.query(`SELECT * FROM ${dbSchema.ASSET_LOCATION_TABLE} WHERE asset_id=${assetId}`)
+    return dbConnection.query(
+        `SELECT * FROM ${dbSchema.ASSET_LOCATION_TABLE} WHERE asset_id=${assetId}\n` +
+        `INNER JOIN ${dbSchema.SITES_TABLE} ON ${dbSchema.ASSET_LOCATION_TABLE}.site_id = ${dbSchema.SITES_TABLE}.site_id\n` +
+        `INNER JOIN ${dbSchema.LOCATIONS_TABLE} ON ${dbSchema.ASSET_LOCATION_TABLE}.location_id = ${dbSchema.LOCATIONS_TABLE}.location_id;`
+    )
     .catch((err) => Promise.reject(new DbOperationError(`Failed to get asset's location data\n\n:${err.stack}`)));
 };
 
@@ -193,7 +200,10 @@ module.exports.getAssetType = (assetId) =>
         throw new TypeError(`Expected integer asset id, got '${assetId}' instead.`);
 
     // Select the asset with given id from the AssetType table and return it
-    return dbConnection.query(`SELECT * FROM ${dbSchema.ASSET_TYPE_TABLE} WHERE asset_id=${assetId}`)
+    return dbConnection.query(
+        `SELECT * FROM ${dbSchema.ASSET_TYPE_TABLE} WHERE asset_id=${assetId}\n` +
+        `INNER JOIN ${dbSchema.CATEGORIES_TABLE} ON ${dbSchema.ASSET_TYPE_TABLE}.category_id = ${dbSchema.CATEGORIES_TABLE}.category_id;`
+    )
     .catch((err) => Promise.reject(new DbOperationError(`Failed to get asset's type data\n\n:${err.stack}`)));
 };
 

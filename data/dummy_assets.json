@@ -2,7 +2,7 @@
 [
     {
         "asset_id": "ace28258-b1de-4fdd-bf5b-dbcaa69a162a",
-        "name": "MacBook Pro 13\"",
+        "asset_name": "MacBook Pro 13\"",
         "brand": "Apple",
         "model": "A2338",
         "serial_no": "SN81274650",
@@ -18,7 +18,7 @@
     },
     {
         "asset_id": "d9afe524-ab40-4166-943c-ef2e615751b9",
-        "name": "Acer Aspire 5 Slim Laptop",
+        "asset_name": "Acer Aspire 5 Slim Laptop",
         "brand": "Acer",
         "model": "A515-46-R14K",
         "serial_no": "SN85785489",
@@ -34,7 +34,7 @@
     },
     {
         "asset_id": "98874cdc-c765-438f-979f-b4a7e0c04a32",
-        "name": "HP EliteDesk 800",
+        "asset_name": "HP EliteDesk 800",
         "brand": "HP",
         "model": "G1",
         "serial_no": "SN3549875646",
@@ -50,7 +50,7 @@
     },
     {
         "asset_id": "b13b1dd7-56fb-4e42-a017-37f062ad3e0a",
-        "name": "Toyota Sprinter Trueno",
+        "asset_name": "Toyota Sprinter Trueno",
         "brand": "Toyota",
         "model": "AE86",
         "serial_no": "SN86868686",
@@ -66,7 +66,7 @@
     },
     {
         "asset_id": "43fdf812-fffd-4c83-bddf-02e6285baa62",
-        "name": "Mazda RX-7 Twin-Turbo",
+        "asset_name": "Mazda RX-7 Twin-Turbo",
         "brand": "Mazda",
         "model": "RX-7 FD",
         "serial_no": "SN54876521",
