@@ -1,4 +1,5 @@
 
+const logger = require("../logger/logger");
 const dbSchema = require("../data/db_schema.json");
 const dbOperations = require("./database_operations");
 const DbOperationError = require("../errors/db_operation_error");
@@ -16,7 +17,6 @@ module.exports.initializeDb = (dbConnection) =>
     }))
     .then((result) => 
     {
-        console.log(`${dbSchema.ASSET_TABLE} table created:\n\n`, result);
         return _createTable(dbConnection, dbSchema.SITES_TABLE, {
             site_id: "INT AUTO_INCREMENT PRIMARY KEY",
             site_name: "VARCHAR(50) NOT NULL"
@@ -24,7 +24,6 @@ module.exports.initializeDb = (dbConnection) =>
     })
     .then((result) => 
     {
-        console.log(`${dbSchema.SITES_TABLE} table created:\n\n`, result);
         return _createTable(dbConnection, dbSchema.LOCATIONS_TABLE, {
             location_id: "INT AUTO_INCREMENT PRIMARY KEY",
             site_id: `INT NOT NULL`,
@@ -36,7 +35,6 @@ module.exports.initializeDb = (dbConnection) =>
     })
     .then((result) => 
     {
-        console.log(`${dbSchema.LOCATIONS_TABLE} table created:\n\n`, result);
         return _createTable(dbConnection, dbSchema.CATEGORIES_TABLE, {
             category_id: "INT AUTO_INCREMENT PRIMARY KEY",
             category_name: "VARCHAR(50) NOT NULL"
@@ -44,7 +42,6 @@ module.exports.initializeDb = (dbConnection) =>
     })
     .then((result) => 
     {
-        console.log(`${dbSchema.CATEGORIES_TABLE} table created:\n\n`, result);
         return _createTable(dbConnection, dbSchema.ASSET_LOCATION_TABLE, {
             asset_id: `CHAR(36) NOT NULL PRIMARY KEY`,
             site_id: `INT NOT NULL`,
@@ -59,7 +56,6 @@ module.exports.initializeDb = (dbConnection) =>
     })
     .then((result) => 
     {
-        console.log(`${dbSchema.ASSET_LOCATION_TABLE} table created:\n\n`, result);
         return _createTable(dbConnection, dbSchema.ASSET_TYPE_TABLE, {
             asset_id: `CHAR(36) NOT NULL PRIMARY KEY`,
             brand: "VARCHAR(50) NOT NULL",
@@ -74,7 +70,6 @@ module.exports.initializeDb = (dbConnection) =>
     })
     .then((result) => 
     {
-        console.log(`${dbSchema.ASSET_TYPE_TABLE} table created:\n\n`, result);
         return _createTable(dbConnection, dbSchema.ASSET_PURCHASE_TABLE, {
             asset_id: `CHAR(36) NOT NULL PRIMARY KEY`,
             purchase_date: "DATE NOT NULL",
@@ -88,7 +83,6 @@ module.exports.initializeDb = (dbConnection) =>
     })
     .then((result) => 
     {
-        console.log(`${dbSchema.ASSET_PURCHASE_TABLE} table created:\n\n`, result);
         return _createTable(dbConnection, dbSchema.ASSET_MAINTENANCE_TABLE, {
             asset_id: `CHAR(36) NOT NULL PRIMARY KEY`,
             maintenance_schedule: "VARCHAR(100) NOT NULL",
@@ -100,12 +94,11 @@ module.exports.initializeDb = (dbConnection) =>
     })
     .then((result) => 
     {
-        console.log(`${dbSchema.ASSET_MAINTENANCE_TABLE} table created:\n\n`, result);
         return _insertDummyData();
     })
     .catch((err) => 
     {
-        console.log(err);
+        logger.log(`Error: ${err.message}`, err.stack);
         return Promise.reject(new DbOperationError(`Error initializing database:\n\n${err.stack}`))
     });
 };
@@ -120,6 +113,11 @@ function _deleteDatabase(dbConnection, dbName)
 
     // Construct query string and pass it to the connection object to query the database
     return dbConnection.query(`DROP DATABASE ${dbName}`)
+    .then((result) => 
+    {
+        logger.log(`Cleaned existing database, if any`);
+        return Promise.resolve(result);
+    })
     .catch((err) => Promise.reject(new DbOperationError(`Deleting database ${dbName} failed\n\n:${err.stack}`)));
 }
 
@@ -132,6 +130,11 @@ function _createDatabase(dbConnection, dbName)
 
     // Construct query string and pass it to the connection object to query the database
     return dbConnection.query(`CREATE DATABASE IF NOT EXISTS ${dbName}`)
+    .then((result) => 
+    {
+        logger.log(`Created new database '${dbName}'`);
+        return Promise.resolve(result);
+    })
     .catch((err) => Promise.reject(new DbOperationError(`Creating database with name ${dbName} failed\n\n:${err.stack}`)));
 }
 
@@ -144,6 +147,11 @@ function _useDatabase(dbConnection, dbName)
 
     // Construct query string and pass it to the connection object to query the database
     return dbConnection.query(`USE ${dbName}`)
+    .then((result) => 
+    {
+        logger.log(`Selected database '${dbName}' to use`);
+        return Promise.resolve(result);
+    })
     .catch((err) => Promise.reject(new DbOperationError(`Selecting database to use with name ${dbName} failed\n\n:${err.stack}`)));
 }
 
@@ -179,8 +187,12 @@ function _createTable(dbConnection, tableName, tableSchema)
         else schemaStr += `\t${colKey} ${colValueType}`;
     }
 
-    console.log(`CREATE TABLE IF NOT EXISTS ${tableName} (\n${schemaStr}${foreignKeysStr}\n);`);
-    return dbConnection.query(`CREATE TABLE IF NOT EXISTS ${tableName} (\n${schemaStr}${foreignKeysStr}\n);`);
+    return dbConnection.query(`CREATE TABLE IF NOT EXISTS ${tableName} (\n${schemaStr}${foreignKeysStr}\n);`)
+    .then((result) => 
+    {
+        logger.log(`Created new table '${tableName}' with schema:`, tableSchema);
+        return Promise.resolve(result);
+    });
 }
 
 function _insertDummyData()
@@ -192,17 +204,17 @@ function _insertDummyData()
     return dbOperations.addSites(sites)
     .then((result) =>
     {
-        console.log(`Added dummy sites\n\n`, result);
+        logger.log(`Finished adding dummy sites`);
         return dbOperations.addCategories(categories);
     })
     .then((result) =>
     {
-        console.log(`Added dummy categories\n\n`, result);
+        logger.log(`Finished adding dummy categories`);
         return dbOperations.addAssets(assets);
     })
     .then((result) =>
     {
-        console.log(`Added dummy assets\n\n`, result);
+        logger.log(`Finished adding dummy assets`);
         return Promise.resolve();
-    })
+    });
 }

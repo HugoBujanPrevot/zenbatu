@@ -1,4 +1,5 @@
 
+const logger = require("../logger/logger");
 const reporter = require("../report_manager/reporter");
 const assetManager = require("../asset_manager/asset_manager");
 const dbOperations = require("../database_integration/database_operations");
@@ -23,10 +24,10 @@ module.exports.initRoutes = function (expressApp)
         .then(() => dbOperations.connect())
         .then(() => 
         {
-            console.log("Generating report");
-            reporter.generateReport().then(console.log);
+            logger.log("Generating report");
+            return reporter.generateReport();
         })
-        .then(() => response.render("index.ejs", { connected: true }))
+        .then((report) => response.render("index.ejs", { connected: true }))
         .catch((err) => response.render("index.ejs", { error: err.message }));
     });
 
@@ -42,21 +43,19 @@ module.exports.initRoutes = function (expressApp)
 
     expressApp.get("/get_asset", (request, response) =>
     {
-        console.log(`User asked for the following asset:\n\n`, request.query);
+        logger.log(`User requested the following asset:\n\n`, request.query);
         
         return assetManager.getAsset({
             name: request.query.name,
             id: request.query.id
-        })
-        .then((result) => console.log(result));
+        });
     });
 
     expressApp.post("/add_asset", (request, response) =>
     {
         var assetData = request.body;
 
-        console.log(`User sent the following data:\n\n`, assetData);
-        return assetManager.addAsset(assetData.name)
-        .then((result) => console.log(result));
+        logger.log(`User sent the following asset data:\n\n`, assetData);
+        return assetManager.addAsset(assetData.name);
     });
 }

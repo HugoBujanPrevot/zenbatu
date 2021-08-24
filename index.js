@@ -1,7 +1,7 @@
 
 const express = require("express");
 const router = require("./routes/main");
-const dbOperations = require("./database_integration/database_operations");
+const logger = require("./logger/logger");
 
 const app = express();
 const port = 8089;
@@ -24,4 +24,4 @@ app.engine("html", require("ejs").renderFile);
 router.initRoutes(app);
 
 // Start listening for connections
-app.listen(port, () => console.log(`Listening on port ${port}`));
+app.listen(port, () => logger.log(`App listening on port ${port}`));
