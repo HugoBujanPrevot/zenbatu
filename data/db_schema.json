@@ -1,6 +1,7 @@
 {
     "DB_NAME":  "Zenbatu",
     
+    "ACCOUNTS_TABLE":  "Accounts",
     "ASSET_TABLE":  "Assets",
     "ASSET_LOCATION_TABLE":  "AssetLocation",
     "ASSET_TYPE_TABLE":  "AssetType",
