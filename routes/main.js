@@ -2,6 +2,7 @@
 const logger = require("../logger/logger");
 const reporter = require("../report_manager/reporter");
 const assetManager = require("../asset_manager/asset_manager");
+const accountManager = require("../account_manager/account_manager");
 const dbOperations = require("../database_integration/database_operations");
 
 
@@ -19,15 +20,26 @@ module.exports.initRoutes = function (expressApp)
     {
         var params = request.body;
 
-        // TODO: Do account checking on account manager
-        Promise.resolve(dbOperations.createConnection(params.ip, params.user, params.password))
+        Promise.resolve(dbOperations.createConnection(params.ip))
         .then(() => dbOperations.connect())
-        .then(() => 
+        .then(() => accountManager.logIn(params.username, params.password))
+        .then(() =>
         {
             logger.log("Generating report");
             return reporter.generateReport();
         })
-        .then((report) => response.render("index.ejs", { connected: true }))
+        .then((report) => response.render("user_home_page.ejs", { report }))
+        .catch((err) => response.render("index.ejs", { error: err.message }));
+    });
+
+    expressApp.post("/create_user", (request, response) =>
+    {
+        var params = request.body;
+
+        Promise.resolve(dbOperations.createConnection(params.ip))
+        .then(() => dbOperations.connect())
+        .then(() => accountManager.signUp(params.username, params.password))
+        .then(() => response.render("index.ejs", { success: true }))
         .catch((err) => response.render("index.ejs", { error: err.message }));
     });
 
