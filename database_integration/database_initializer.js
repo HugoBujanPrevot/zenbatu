@@ -3,12 +3,17 @@ const logger = require("../logger/logger");
 const dbSchema = require("../data/db_schema.json");
 const dbOperations = require("./database_operations");
 const DbOperationError = require("../errors/db_operation_error");
+const accountManager = require("../account_manager/account_manager");
 
 module.exports.initializeDb = (dbConnection) =>
 {
     return _deleteDatabase(dbConnection, dbSchema.DB_NAME)
     .then(() => _createDatabase(dbConnection, dbSchema.DB_NAME))
     .then(() => _useDatabase(dbConnection, dbSchema.DB_NAME))
+    .then(() => _createTable(dbConnection, dbSchema.ACCOUNTS_TABLE, {
+        username: "VARCHAR(36) NOT NULL PRIMARY KEY",
+        password: "CHAR(60) NOT NULL"
+    }))
     .then(() => _createTable(dbConnection, dbSchema.ASSET_TABLE, {
         asset_id: "CHAR(36) NOT NULL PRIMARY KEY",
         asset_name: "VARCHAR(50) NOT NULL",
@@ -112,7 +117,7 @@ function _deleteDatabase(dbConnection, dbName)
         throw new TypeError(`Expected string, got '${dbName}' instead.`);
 
     // Construct query string and pass it to the connection object to query the database
-    return dbConnection.query(`DROP DATABASE ${dbName}`)
+    return dbConnection.query(`DROP DATABASE IF EXISTS ${dbName}`)
     .then((result) => 
     {
         logger.log(`Cleaned existing database, if any`);
@@ -200,6 +205,7 @@ function _insertDummyData()
     const assets = require("../data/dummy_assets.json");
     const categories = require("../data/dummy_categories.json");
     const sites = require("../data/dummy_sites.json");
+    const testAccount = require("../data/dummy_accounts.json")[0];
 
     return dbOperations.addSites(sites)
     .then((result) =>
@@ -215,6 +221,11 @@ function _insertDummyData()
     .then((result) =>
     {
         logger.log(`Finished adding dummy assets`);
+        return accountManager.signUp(testAccount.username, testAccount.password);
+    })
+    .then((result) =>
+    {
+        logger.log(`Finished adding dummy account`);
         return Promise.resolve();
     });
 }
