@@ -22,22 +22,38 @@
 
         <%- include('./partials/navbar.ejs', { page: "home" })-%>
 
-        <form id="connectForm" action="/connect" method="POST">
-            <input id="ipInput" name="ip" type="text" placeholder="Database IP">
-            <input id="userInput" name="user" type="text" placeholder="Username">
-            <input id="passwordInput" name="password" type="password" placeholder="Password">
-            <input type="submit" value="Connect to Database" >
+        <form id="loginForm" action="/connect" method="POST">
+            <label for="ipInput">Database IP</label>
+            <input id="ipInput" name="ip" type="text" value="localhost">
+
+            <label for="usernameLoginInput">Username</label>
+            <input id="usernameLoginInput" name="username" type="text" placeholder="Username">
+            
+            <label for="passwordLoginInput">Password</label>
+            <input id="passwordLoginInput" name="password" type="password" placeholder="Password">
+
+            <input type="submit" value="Log In" >
+        </form>
+
+        <form id="signupForm" action="/create_user" method="POST">
+            <label for="usernameSignupInput">Username</label>
+            <input id="usernameSignupInput" name="username" type="text" placeholder="Username">
+            
+            <label for="passwordSignupInput">Password</label>
+            <input id="passwordSignupInput" name="password" type="password" placeholder="Password">
+
+            <input type="submit" value="Create Account" >
         </form>
 
         <!-- If connection succeeded, give feedback -->
-        <% if (typeof connected === "boolean" && connected === true) { %>
+        <% if (typeof success === "boolean" && success === true) { %>
 
-            <span>Connected successfully!</span>
+            <span>Account created! You can now log in.</span>
 
         <!-- If an error occurred while doing so, render it as well -->
         <% } else if (typeof error === "string") { %>
 
-            <span>Could not connect to the database: <%=error %> </span>
+            <span>Error occurred: <%=error %> </span>
 
         <% } %>
 
