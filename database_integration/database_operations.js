@@ -20,8 +20,8 @@ const DbOperationError = require("../errors/db_operation_error");
 
 module.exports.createConnection = (hostIp, username, password) =>
 {
-    dbConnection.createConnection(hostIp, username, password);
-    logger.log(`Created database connection @ ${hostIp} for ${username}`);
+    dbConnection.createConnection(hostIp, "root", "root");
+    logger.log(`Created database connection @ ${hostIp}`);
 };
 
 module.exports.connect = () =>
@@ -33,6 +33,18 @@ module.exports.connect = () =>
         return dbInitializer.initializeDb(dbConnection);
     })
     .then(() => logger.log(`Database initialized with dummy data`));
+};
+
+
+module.exports.addAccount = (username, password) =>
+{
+    return dbConnection.query(`INSERT INTO ${dbSchema.ACCOUNTS_TABLE} (username, password) VALUES ('${username}', '${password}');`)
+    .then((result) => 
+    {
+        logger.log(`Account with username '${username}' added to the database`);
+        return Promise.resolve(result);
+    })
+    .catch((err) => Promise.reject(new DbOperationError(`Failed to add account\n\n:${err.stack}`)));
 };
 
 
@@ -151,6 +163,17 @@ module.exports.showTableSchema = (tableName) =>
     .catch((err) => Promise.reject(new DbOperationError(`Failed to describe ${tableName}\n\n:${err.stack}`)));
 };
 
+module.exports.deleteAccount = (username) =>
+{
+    return dbConnection.query(`DELETE FROM ${dbSchema.ACCOUNTS_TABLE} WHERE account = ${username}`)
+    .then((result) => 
+    {
+        logger.log(`Account with username ${username} deleted from database`);
+        return Promise.resolve(result);
+    })
+    .catch((err) => Promise.reject(new DbOperationError(`Failed to delete account with username ${username}\n\n:${err.stack}`)));
+};
+
 module.exports.deleteAsset = (assetId) =>
 {
     // All sub-tables (AssetLocation, AssetPurchase, etc.) where asset_id is a foreign key should be
@@ -191,6 +214,18 @@ module.exports.deleteAllAssets = () =>
         return Promise.resolve(result);
     })
     .catch((err) => Promise.reject(new DbOperationError(`Failed to delete all assets\n\n:${err.stack}`)));
+};
+
+
+module.exports.getAccount = (username) =>
+{
+    return dbConnection.query(`SELECT * FROM ${dbSchema.ACCOUNTS_TABLE} WHERE username = '${username}';`)
+    .then((result) => 
+    {
+        logger.log(`Fetched account with username ${username} from database`);
+        return Promise.resolve(result[0]);
+    })
+    .catch((err) => Promise.reject(new DbOperationError(`Failed to get account\n\n:${err.stack}`)));
 };
 
 // Get all assets in the database and return them
