@@ -18,7 +18,8 @@ module.exports.initRoutes = function (expressApp)
 
     expressApp.post("/connect", (request, response) =>
     {
-        var params = request.body;
+        const params = request.body;
+        const data = {};
 
         Promise.resolve(dbOperations.createConnection(params.ip))
         .then(() => dbOperations.connect())
@@ -28,9 +29,23 @@ module.exports.initRoutes = function (expressApp)
             logger.log("Fetching assets...");
             return assetManager.getFullAssets();
         })
-        .then((assets) => response.render("user_home_page.ejs", { 
-            assets
-        }))
+        .then((assets) => 
+        {
+            data.assets = assets;
+            return dbOperations.getAllCategories();
+        })
+        .then((categories) => 
+        {
+            data.categories = categories;
+            return dbOperations.getAllSites();
+        })
+        .then((sites) => 
+        {
+            data.sites = sites;
+            console.log("Full front end data");
+            console.log(data);
+            return response.render("user_home_page.ejs", data);
+        })
         .catch((err) => response.render("index.ejs", { error: err.message }));
     });
 
