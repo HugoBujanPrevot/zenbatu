@@ -63,9 +63,9 @@
 
                                 <select id="assetCategoryInput" name="category" required>
 
-                                    <% if (typeof data.categories === "object" && Array.isArray(data.categories) === true) { %>
+                                    <% if (typeof categories === "object" && Array.isArray(categories) === true) { %>
 
-                                        <% data.categories.forEach((category) => { %>
+                                        <% categories.forEach((category) => { %>
                                             <option value=<%=category.id %>><%=category.name %></option>
                                         <% }); %>
 
@@ -75,9 +75,9 @@
                                 
                                 <select id="assetSiteInput" name="site" required>
 
-                                    <% if (typeof data.sites === "object" && Array.isArray(data.sites) === true) { %>
+                                    <% if (typeof sites === "object" && Array.isArray(sites) === true) { %>
 
-                                        <% data.sites.forEach((site) => { %>
+                                        <% sites.forEach((site) => { %>
                                             <option value=<%=category %>><%=category %></option>
                                         <% }); %>
 
