@@ -66,7 +66,7 @@
                                     <% if (typeof categories === "object" && Array.isArray(categories) === true) { %>
 
                                         <% categories.forEach((category) => { %>
-                                            <option value=<%=category.id %>><%=category.name %></option>
+                                            <option value=<%=category.category_id %>><%=category.category_name %></option>
                                         <% }); %>
 
                                     <% } %>
@@ -78,7 +78,7 @@
                                     <% if (typeof sites === "object" && Array.isArray(sites) === true) { %>
 
                                         <% sites.forEach((site) => { %>
-                                            <option value=<%=category %>><%=category %></option>
+                                            <option value=<%=site.location_id %>><%=`${site.site_name} - ${site.location_name}` %></option>
                                         <% }); %>
 
                                     <% } %>
@@ -142,7 +142,7 @@
 
                                 <% assets.forEach((asset) => { %>
                                     
-                                    <% //console.log(asset) %>
+                                    <% console.log(asset) %>
 
                                     <tr>
                                         <td><%=asset.asset_id %></td>
