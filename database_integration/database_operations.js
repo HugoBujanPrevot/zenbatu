@@ -228,6 +228,56 @@ module.exports.getAccount = (username) =>
     .catch((err) => Promise.reject(new DbOperationError(`Failed to get account\n\n:${err.stack}`)));
 };
 
+module.exports.getCategory = (id) =>
+{
+    return dbConnection.query(`SELECT * FROM ${dbSchema.CATEGORIES_TABLE} WHERE category_id = '${id}';`)
+    .then((result) => 
+    {
+        logger.log(`Fetched category with id ${id} from database`);
+        return Promise.resolve(result[0]);
+    })
+    .catch((err) => Promise.reject(new DbOperationError(`Failed to get category with id ${id}\n\n:${err.stack}`)));
+};
+
+module.exports.getAllCategories = () =>
+{
+    return dbConnection.query(`SELECT * FROM ${dbSchema.CATEGORIES_TABLE};`)
+    .then((result) => 
+    {
+        logger.log(`Fetched all categories from database`);
+        return Promise.resolve(result);
+    })
+    .catch((err) => Promise.reject(new DbOperationError(`Failed to get all categories\n\n:${err.stack}`)));
+};
+
+module.exports.getSite = (id) =>
+{
+    return dbConnection.query(
+        `SELECT * FROM ${dbSchema.SITES_TABLE} WHERE site_id = '${id}'\n` +
+        `INNER JOIN ${dbSchema.LOCATIONS_TABLE} ON ${dbSchema.SITES_TABLE}.site_id = ${dbSchema.LOCATIONS_TABLE}.site_id;`
+    )
+    .then((result) => 
+    {
+        logger.log(`Fetched site with id ${id} from database`);
+        return Promise.resolve(result[0]);
+    })
+    .catch((err) => Promise.reject(new DbOperationError(`Failed to get site with id ${id}\n\n:${err.stack}`)));
+};
+
+module.exports.getAllSites = () =>
+{
+    return dbConnection.query(
+        `SELECT * FROM ${dbSchema.SITES_TABLE}\n` +
+        `INNER JOIN ${dbSchema.LOCATIONS_TABLE} ON ${dbSchema.SITES_TABLE}.site_id = ${dbSchema.LOCATIONS_TABLE}.site_id;`
+    )
+    .then((result) => 
+    {
+        logger.log(`Fetched all sites from database`);
+        return Promise.resolve(result);
+    })
+    .catch((err) => Promise.reject(new DbOperationError(`Failed to get all sites\n\n:${err.stack}`)));
+};
+
 // Get all assets in the database and return them
 module.exports.getAsset = (assetNameOrId) =>
 {
