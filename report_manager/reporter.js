@@ -21,11 +21,11 @@ module.exports.generateReport = async function()
 
         assets.forEach((asset) =>
         {
-            const assetReport = {
+            const assetReport = Object.assign(asset, {
                 needsMaintenance:       _doesAssetNeedMaintenance(asset),
                 currentValue:           _getCurrentAssetValue(asset),
                 hasExceededLifespan:    _hasAssetExceededLifespan(asset)
-            };
+            });
 
             report.push(assetReport);
         });
