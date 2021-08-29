@@ -25,3 +25,13 @@ module.exports.getAsset = ({name, id}) =>
         return Promise.reject(new Error(`Error occurred when getting the asset from the database.`));
     });
 };
+
+module.exports.getFullAssets = () =>
+{
+    return dbOperations.getFullAssets()
+    .catch((err) =>
+    {
+        logger.log(`Error: ${err.message}`, err.stack);
+        return Promise.reject(new Error(`Error occurred when getting the full assets from the database.`));
+    });
+};

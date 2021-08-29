@@ -25,10 +25,12 @@ module.exports.initRoutes = function (expressApp)
         .then(() => accountManager.logIn(params.username, params.password))
         .then(() =>
         {
-            logger.log("Generating report");
-            return reporter.generateReport();
+            logger.log("Fetching assets...");
+            return assetManager.getFullAssets();
         })
-        .then((report) => response.render("user_home_page.ejs", { report }))
+        .then((assets) => response.render("user_home_page.ejs", { 
+            assets
+        }))
         .catch((err) => response.render("index.ejs", { error: err.message }));
     });
 
