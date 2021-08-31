@@ -16,6 +16,11 @@ module.exports.initRoutes = function (expressApp)
         response.render("index.ejs");
     });
 
+    expressApp.get("/database", (request, response) =>
+    {
+        response.render("database.ejs");
+    });
+
     expressApp.post("/connect", (request, response) =>
     {
         const params = request.body;

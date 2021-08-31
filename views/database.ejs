@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+    <%- include('./partials/header.ejs')-%>
+<body>
+
+    <%- include('./partials/navbar.ejs')-%>
+
+        <!-- ======= Connect Section ======= -->
+        <section id="connect" class="connect">
+
+            <div class="container" data-aos="fade-up">
+
+                <header class="section-header" style="margin-top: 50px">
+                    <h2>Connection</h2>
+                    <p>Connect Database</p>
+                </header>
+
+                <div class="row gy-4">
+
+                    <div class="col-lg-12">
+
+                        <form action="/connect" method="post" class="connect-form">
+                            <div class="row gy-4">
+
+                                <div class="col-md-6">
+                                    <input type="text" name="ip" class="form-control" placeholder="IP Address" value="localhost" required>
+                                </div>
+
+                                <div class="col-md-6 ">
+                                    <input type="text" class="form-control" name="username" placeholder="DB Username" required>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <input type="password" class="form-control" name="password" placeholder="DB Password" required>
+                                </div>
+
+                                <div class="col-md-12 text-center">
+                                    <div class="loading">Loading</div>
+
+                                    <!-- If connection succeeded, give feedback -->
+                                    <% if (typeof success === "boolean" && success === true) { %>
+                                        <div class="sent-message">Database Connected. Thank you!</div>
+                                    <!-- If an error occurred while doing so, render it as well -->
+                                    <% } else if (typeof error === "string") { %>
+                                        <div class="error-message">Error occurred: <%=error %></div>
+                                    <% } %>
+
+                                    <button type="submit">Connect Database</button>
+                                </div>
+
+                            </div>
+                        </form>
+
+                    </div>
+
+                </div>
+
+
+                <header class="section-header" style="margin-top: 50px">
+                    <h2>Account</h2>
+                    <p>Create Account</p>
+                </header>
+
+                <div class="row gy-4">
+
+                    <div class="col-lg-12">
+
+                        <form action="/create_user" method="post" class="connect-form">
+                            <div class="row gy-4">
+
+                                <div class="col-md-12">
+                                    <input type="text" class="form-control" name="username" placeholder="Username" required>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <input type="password" class="form-control" name="password" placeholder="Password" required>
+                                </div>
+
+                                <div class="col-md-12 text-center">
+                                    <div class="loading">Loading</div>
+
+                                    <!-- If connection succeeded, give feedback -->
+                                    <% if (typeof success === "boolean" && success === true) { %>
+                                        <div class="sent-message">Account Created. Thank you!</div>
+                                    <!-- If an error occurred while doing so, render it as well -->
+                                    <% } else if (typeof error === "string") { %>
+                                        <div class="error-message">Error occurred: <%=error %></div>
+                                    <% } %>
+
+                                    <button type="submit">Create Account</button>
+                                </div>
+
+                            </div>
+                        </form>
+
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section><!-- End Connect Section -->
+
+    </main><!-- End #main -->
+
+    <%- include('./partials/footer.ejs')-%>
+
+</body>
+
+</html>
