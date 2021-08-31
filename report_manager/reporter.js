@@ -12,19 +12,16 @@ const DAYS_IN_YEAR = 365;
 // and generate a report on whether their maintenance is due, as well
 // as their current value given their useful lifespan and whether
 // the asset has exceeded its useful life
-module.exports.generateReport = async function()
-{
-    try
-    {
+module.exports.generateReport = async function () {
+    try {
         const assets = await dbOperations.getFullAssets();
         const report = [];
 
-        assets.forEach((asset) =>
-        {
+        assets.forEach((asset) => {
             const assetReport = Object.assign(asset, {
-                needsMaintenance:       _doesAssetNeedMaintenance(asset),
-                currentValue:           _getCurrentAssetValue(asset),
-                hasExceededLifespan:    _hasAssetExceededLifespan(asset)
+                needsMaintenance: _doesAssetNeedMaintenance(asset),
+                currentValue: _getCurrentAssetValue(asset),
+                hasExceededLifespan: _hasAssetExceededLifespan(asset)
             });
 
             report.push(assetReport);
@@ -32,18 +29,14 @@ module.exports.generateReport = async function()
 
         logger.log("Generated asset report:", report);
         return report;
-    }
-
-    catch(err)
-    {
+    } catch (err) {
         logger.log(`Error: ${err.message}`, err.stack);
     }
 };
 
 
 // Calculate how many days have passed since the asset's last maintenance
-function _getDaysSinceLastMaintenance(asset)
-{
+function _getDaysSinceLastMaintenance(asset) {
     const now = Date.now();
     const lastMaintenanceDate = new Date(asset.last_maintenance_date);
     logger.log(`Asset ${asset.asset_name}'s last maintenance date is ${lastMaintenanceDate}, or ${lastMaintenanceDate.getTime()}ms`);
@@ -58,8 +51,7 @@ function _getDaysSinceLastMaintenance(asset)
 }
 
 // Calculate how many days have passed since the asset's purchase date
-function _getDaysSincePurchase(asset)
-{
+function _getDaysSincePurchase(asset) {
     const now = Date.now();
     logger.log(`Current time in ms is ${now}`);
     const purchaseDate = new Date(asset.purchase_date);
@@ -75,8 +67,7 @@ function _getDaysSincePurchase(asset)
 
 // Calculate an asset's current value given its useful lifespan, the date
 // at which it was bought, and the price for which it was bought at the time
-function _getCurrentAssetValue(asset)
-{
+function _getCurrentAssetValue(asset) {
     const purchaseValue = asset.cost;
     const usefulLife = asset.useful_life;
     const usefulLifeInDays = usefulLife * DAYS_IN_YEAR;
@@ -84,7 +75,7 @@ function _getCurrentAssetValue(asset)
     // An asset without a useful lifespan of more than 1 year is worthless after purchase
     if (usefulLife === 0)
         return 0;
-        
+
     // Work out the asset's daily value decay rate based on its lifespan and original cost
     const dailyDecay = purchaseValue / usefulLifeInDays;
     logger.log(`Asset ${asset.asset_name}'s daily value decay is ${dailyDecay}`);
@@ -94,7 +85,7 @@ function _getCurrentAssetValue(asset)
 
     // Work out the current value taking into account the original cost, the daily decay
     // in price and the days since the purchase was made
-    const currentValue = (purchaseValue - ( dailyDecay * daysSincePurchase )).toFixed(2);
+    const currentValue = (purchaseValue - (dailyDecay * daysSincePurchase)).toFixed(2);
     logger.log(`Asset ${asset.asset_name}'s current value is ${currentValue}`);
 
     return currentValue;
@@ -103,8 +94,7 @@ function _getCurrentAssetValue(asset)
 
 // Figure out whether the asset has exceeded its lifespan by comparing its useful life
 // to the number of years that passed since it was last acquired
-function _hasAssetExceededLifespan(asset)
-{
+function _hasAssetExceededLifespan(asset) {
     const daysSincePurchase = _getDaysSincePurchase(asset);
     const yearsSincePurchase = Math.floor(daysSincePurchase / DAYS_IN_YEAR);
     logger.log(`Asset ${asset.asset_name}'s years since purchase are ${yearsSincePurchase}`);
@@ -117,52 +107,32 @@ function _hasAssetExceededLifespan(asset)
 
 // Figure out whether the maintenance schedule of the asset and the days that
 // passed since its last maintenance warrant a new maintenance session
-function _doesAssetNeedMaintenance(asset)
-{
-    const daysSinceMaintenance =_getDaysSinceLastMaintenance(asset);
+function _doesAssetNeedMaintenance(asset) {
+    const daysSinceMaintenance = _getDaysSinceLastMaintenance(asset);
     const maintenanceSchedule = asset.maintenance_schedule;
 
-    if (maintenanceSchedule === "daily")
-    {
+    if (maintenanceSchedule === "daily") {
         if (daysSinceMaintenance >= 1) return true;
         else return false;
     }
 
-    if (maintenanceSchedule === "weekly")
-    {
+    if (maintenanceSchedule === "weekly") {
         if (daysSinceMaintenance >= DAYS_IN_WEEK) return true;
         else return false;
-    }
-    
-    else if (maintenanceSchedule === "biweekly")
-    {
+    } else if (maintenanceSchedule === "biweekly") {
         if (daysSinceMaintenance >= DAYS_IN_WEEK * 2) return true;
         else return false;
-    }
-    
-    else if (maintenanceSchedule === "monthly")
-    {
+    } else if (maintenanceSchedule === "monthly") {
         if (daysSinceMaintenance >= DAYS_IN_MONTH) return true;
         else return false;
-    }
-    
-    else if (maintenanceSchedule === "bimonthly")
-    {
+    } else if (maintenanceSchedule === "bimonthly") {
         if (daysSinceMaintenance >= DAYS_IN_MONTH * 2) return true;
         else return false;
-    }
-    
-    else if (maintenanceSchedule === "quarterly")
-    {
+    } else if (maintenanceSchedule === "quarterly") {
         if (daysSinceMaintenance >= DAYS_IN_QUARTER) return true;
         else return false;
-    }
-    
-    else if (maintenanceSchedule === "annually")
-    {
+    } else if (maintenanceSchedule === "annually") {
         if (daysSinceMaintenance >= DAYS_IN_YEAR) return true;
         else return false;
-    }
-
-    else return false;
+    } else return false;
 }

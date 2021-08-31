@@ -1,4 +1,3 @@
-
 const express = require("express");
 const router = require("./routes/main");
 const logger = require("./logger/logger");
@@ -9,7 +8,7 @@ const port = 8089;
 
 // Set http request parsers
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({extended: true}));
 
 // Make all files inside of the client folder accessible to the front-end
 app.use(express.static(__dirname + "/client"));

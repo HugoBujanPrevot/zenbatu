@@ -1,4 +1,3 @@
-
 const fs = require("fs");
 const fsp = require("fs").promises;
 
@@ -7,12 +6,10 @@ const INDENT = "  ";
 
 fs.writeFileSync(LOG_PATH, "");
 
-module.exports.log = async (message, ...data) =>
-{
+module.exports.log = async (message, ...data) => {
     var str = message + "\n";
 
-    data.forEach((line) =>
-    {
+    data.forEach((line) => {
         if (typeof line === "object")
             str += "\n" + _indentJSON(line);
 
@@ -25,16 +22,13 @@ module.exports.log = async (message, ...data) =>
 
 
 // Stringify a json object with full indentation
-function _indentJSON(obj)
-{
+function _indentJSON(obj) {
     // Replace the normal stringification if the object is an Error,
     // otherwise they will show as empty {} objects
-    const jsonStr = JSON.stringify(obj, function replacer(objKey, objValue)
-    {
+    const jsonStr = JSON.stringify(obj, function replacer(objKey, objValue) {
         const err = {};
 
-        if (objValue instanceof Error)
-        {
+        if (objValue instanceof Error) {
             Object.getOwnPropertyNames(objValue).forEach((key) => err[key] = objValue[key]);
             return err;
         }

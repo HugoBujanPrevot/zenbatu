@@ -1,9 +1,14 @@
-
-
-
 [
-    { "category_name": "Laptop" },
-    { "category_name": "Desktop PC" },
-    { "category_name": "Personal Vehicle" },
-    { "category_name": "Machinery" }
+    {
+        "category_name": "Laptop"
+    },
+    {
+        "category_name": "Desktop PC"
+    },
+    {
+        "category_name": "Personal Vehicle"
+    },
+    {
+        "category_name": "Machinery"
+    }
 ]
