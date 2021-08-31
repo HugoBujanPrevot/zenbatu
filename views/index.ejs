@@ -1,61 +1,332 @@
-
-
 <!DOCTYPE html>
-<html>
-    <head>
+<html lang="en">
+    <%- include('./partials/header.ejs')-%>
+<body>
 
-        <!-- Popper and Bootstrap JS -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <%- include('./partials/navbar.ejs')-%>
 
-        <!-- Bootstrap 4 -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <!-- ======= Hero Section ======= -->
+    <section id="hero" class="hero d-flex align-items-center">
 
-        <!-- Personal style sheet -->
-        <link rel="stylesheet" href="./css/styles.css">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 d-flex flex-column justify-content-center">
+                    <h1 data-aos="fade-up">We offer modern solutions for Asset Management</h1>
+                    <h2 data-aos="fade-up" data-aos-delay="400">Track and manage your business assets, with ease!</h2>
+                    <div data-aos="fade-up" data-aos-delay="600">
+                        <div class="text-center text-lg-start">
+                            <a href="#about" class="btn-get-started scrollto d-inline-flex align-items-center justify-content-center align-self-center">
+                                <span>Get Started</span>
+                                <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 hero-img" data-aos="zoom-out" data-aos-delay="200">
+                    <img src="assets/img/hero-img.png" class="img-fluid" alt="">
+                </div>
+            </div>
+        </div>
 
-        <title>Zenbatu Home Page</title>
+    </section><!-- End Hero -->
 
-    </head>
+    <main id="main">
 
-    <body>
+        <!-- ======= About Section ======= -->
+        <section id="about" class="about">
 
-        <%- include('./partials/navbar.ejs', { page: "home" })-%>
+            <div class="container" data-aos="fade-up">
 
-        <form id="loginForm" action="/connect" method="POST">
-            <label for="ipInput">Database IP</label>
-            <input id="ipInput" name="ip" type="text" value="localhost">
+                <header class="section-header">
+                    <h2>The main modules</h2>
+                    <p>About Zenbatu</p>
+                </header>
 
-            <label for="usernameLoginInput">Username</label>
-            <input id="usernameLoginInput" name="username" type="text" placeholder="Username">
-            
-            <label for="passwordLoginInput">Password</label>
-            <input id="passwordLoginInput" name="password" type="password" placeholder="Password">
+                <div class="row">
 
-            <input type="submit" value="Log In" >
-        </form>
+                    <div class="col-lg-4">
+                        <div class="box" data-aos="fade-up" data-aos-delay="200">
+                            <img src="assets/img/about-1.png" class="img-fluid" alt="">
+                            <h3>Asset Manager</h3>
+                            <p>Organizations can add, update, keep history records and delete their assets with flexibility.</p>
+                        </div>
+                    </div>
 
-        <form id="signupForm" action="/create_user" method="POST">
-            <label for="usernameSignupInput">Username</label>
-            <input id="usernameSignupInput" name="username" type="text" placeholder="Username">
-            
-            <label for="passwordSignupInput">Password</label>
-            <input id="passwordSignupInput" name="password" type="password" placeholder="Password">
+                    <div class="col-lg-4 mt-4 mt-lg-0">
+                        <div class="box" data-aos="fade-up" data-aos-delay="400">
+                            <img src="assets/img/about-2.png" class="img-fluid" alt="">
+                            <h3>Report Manager</h3>
+                            <p>The list of tracked assets could be exported, and reports could be generated.</p>
+                        </div>
+                    </div>
 
-            <input type="submit" value="Create Account" >
-        </form>
+                    <div class="col-lg-4 mt-4 mt-lg-0">
+                        <div class="box" data-aos="fade-up" data-aos-delay="600">
+                            <img src="assets/img/about-3.png" class="img-fluid" alt="">
+                            <h3>Account Manager</h3>
+                            <p>Through account management, organizations can assign asset managers, and permissions.</p>
+                        </div>
+                    </div>
 
-        <!-- If connection succeeded, give feedback -->
-        <% if (typeof success === "boolean" && success === true) { %>
+                </div>
 
-            <span>Account created! You can now log in.</span>
+            </div>
 
-        <!-- If an error occurred while doing so, render it as well -->
-        <% } else if (typeof error === "string") { %>
+        </section><!-- End About Section -->
 
-            <span>Error occurred: <%=error %> </span>
+        <!-- ======= Counts Section ======= -->
+        <section id="counts" class="counts">
+            <div class="container" data-aos="fade-up">
 
-        <% } %>
+                <div class="row gy-4">
 
-    </body>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="count-box">
+                            <i class="bi bi-emoji-smile"></i>
+                            <div>
+                                <span data-purecounter-start="0" data-purecounter-end="32" data-purecounter-duration="1" class="purecounter"></span>
+                                <p>Potential Customers</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <div class="count-box">
+                            <i class="bi bi-journal-richtext" style="color: #ee6c20;"></i>
+                            <div>
+                                <span data-purecounter-start="0" data-purecounter-end="321" data-purecounter-duration="1" class="purecounter"></span>
+                                <p>Tracked Assets</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <div class="count-box">
+                            <i class="bi bi-headset" style="color: #15be56;"></i>
+                            <div>
+                                <span data-purecounter-start="0" data-purecounter-end="463" data-purecounter-duration="1" class="purecounter"></span>
+                                <p>Hours Of Development</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <div class="count-box">
+                            <i class="bi bi-people" style="color: #bb0852;"></i>
+                            <div>
+                                <span data-purecounter-start="0" data-purecounter-end="5" data-purecounter-duration="1" class="purecounter"></span>
+                                <p>Team Members</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </section><!-- End Counts Section -->
+
+        <!-- ======= Testimonials Section ======= -->
+        <section id="testimonials" class="testimonials">
+
+            <div class="container" data-aos="fade-up">
+
+                <header class="section-header">
+                    <h2>Testimonials</h2>
+                    <p>What they are saying about us</p>
+                </header>
+
+                <div class="testimonials-slider swiper-container" data-aos="fade-up" data-aos-delay="200">
+                    <div class="swiper-wrapper">
+
+                        <div class="swiper-slide">
+                            <div class="testimonial-item">
+                                <div class="stars">
+                                    <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                                </div>
+                                <p>Wow what great service, I love it! Zenbatu is the most valuable business resource we have EVER purchased. I will refer everyone I know.</p>
+                                <div class="profile mt-auto">
+                                    <img src="assets/img/testimonials/testimonials-1.jpg" class="testimonial-img" alt="">
+                                    <h3>Dally Wilsson</h3>
+                                    <h4>Ceo &amp; Founder</h4>
+                                </div>
+                            </div>
+                        </div><!-- End testimonial item -->
+
+                        <div class="swiper-slide">
+                            <div class="testimonial-item">
+                                <div class="stars">
+                                    <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                                </div>
+                                <p>Very easy to use. It fits our needs perfectly. No matter what's your business needs, Zenbatu is the best solution for asset management!</p>
+                                <div class="profile mt-auto">
+                                    <img src="assets/img/testimonials/testimonials-2.jpg" class="testimonial-img" alt="">
+                                    <h3>Sara Rube</h3>
+                                    <h4>CIO</h4>
+                                </div>
+                            </div>
+                        </div><!-- End testimonial item -->
+
+                        <div class="swiper-slide">
+                            <div class="testimonial-item">
+                                <div class="stars">
+                                    <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                                </div>
+                                <p>I am so pleased with this product. It really saves me time and effort. Zenbatu is exactly what our business has been lacking. It's really wonderful.</p>
+                                <div class="profile mt-auto">
+                                    <img src="assets/img/testimonials/testimonials-3.jpg" class="testimonial-img" alt="">
+                                    <h3>Suzan Karlis</h3>
+                                    <h4>Warehouse Manager</h4>
+                                </div>
+                            </div>
+                        </div><!-- End testimonial item -->
+
+                        <div class="swiper-slide">
+                            <div class="testimonial-item">
+                                <div class="stars">
+                                    <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                                </div>
+                                <p>Absolutely wonderful! After using Zenbatu my business skyrocketed! Zenbatu saved my business.</p>
+                                <div class="profile mt-auto">
+                                    <img src="assets/img/testimonials/testimonials-4.jpg" class="testimonial-img" alt="">
+                                    <h3>Martin Brandon</h3>
+                                    <h4>SME Owner</h4>
+                                </div>
+                            </div>
+                        </div><!-- End testimonial item -->
+
+                        <div class="swiper-slide">
+                            <div class="testimonial-item">
+                                <div class="stars">
+                                    <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                                </div>
+                                <p>We've used Zenbatu for the last five years. Thanks for the great service.</p>
+                                <div class="profile mt-auto">
+                                    <img src="assets/img/testimonials/testimonials-5.jpg" class="testimonial-img" alt="">
+                                    <h3>John Larry</h3>
+                                    <h4>Entrepreneur</h4>
+                                </div>
+                            </div>
+                        </div><!-- End testimonial item -->
+
+                    </div>
+                    <div class="swiper-pagination"></div>
+                </div>
+
+            </div>
+
+        </section><!-- End Testimonials Section -->
+
+        <!-- ======= Contact Section ======= -->
+        <section id="contact" class="contact">
+
+            <div class="container" data-aos="fade-up">
+
+                <header class="section-header">
+                    <h2>Contact</h2>
+                    <p>Contact Us</p>
+                </header>
+
+                <div class="row gy-4">
+
+                    <div class="col-lg-6">
+
+                        <div class="row gy-4">
+                            <div class="col-md-6">
+                                <div class="info-box">
+                                    <i class="bi bi-geo-alt"></i>
+                                    <h3>Address</h3>
+                                    <p>8 Lewisham Way, <br />London SE14 6NW</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="info-box">
+                                    <i class="bi bi-telephone"></i>
+                                    <h3>Call Us</h3>
+                                    <p>+44 20 7919 7171<br>+44 20 7862 8000</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="info-box">
+                                    <i class="bi bi-envelope"></i>
+                                    <h3>Email Us</h3>
+                                    <p>info@zenbatu.test<br>support@zenbatu.test</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="info-box">
+                                    <i class="bi bi-clock"></i>
+                                    <h3>Open Hours</h3>
+                                    <p>Monday - Friday<br>9:00AM - 05:00PM</p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-lg-6">
+                        <form action="#" method="post" class="contact-form">
+                            <div class="row gy-4">
+
+                                <div class="col-md-6">
+                                    <input type="text" name="name" class="form-control" placeholder="Your Name" required>
+                                </div>
+
+                                <div class="col-md-6 ">
+                                    <input type="email" class="form-control" name="email" placeholder="Your Email" required>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <input type="text" class="form-control" name="subject" placeholder="Subject" required>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <textarea class="form-control" name="message" rows="6" placeholder="Message" required></textarea>
+                                </div>
+
+                                <div class="col-md-12 text-center">
+                                    <div class="loading">Loading</div>
+                                    <div class="error-message"></div>
+                                    <div class="sent-message">Your message has been sent. Thank you!</div>
+
+                                    <button type="submit">Send Message</button>
+                                </div>
+
+                            </div>
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section><!-- End Contact Section -->
+
+    </main><!-- End #main -->
+
+
+    <footer class="footer">
+
+        <div class="footer-newsletter">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-12 text-center">
+                        <h4>Our Newsletter</h4>
+                        <p>Tamen quem nulla quae legam multos aute sint culpa legam noster magna</p>
+                    </div>
+                    <div class="col-lg-6">
+                        <form action="" method="post">
+                            <input type="email" name="email"><input type="submit" value="Subscribe">
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </footer>
+
+    <%- include('./partials/footer.ejs')-%>
+
+</body>
+
 </html>
