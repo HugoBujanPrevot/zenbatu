@@ -17,42 +17,42 @@ module.exports.initRoutes = function (expressApp) {
         response.render("database.ejs");
     });
 
-    expressApp.post("/connect", (request, response) => {
+    expressApp.get("/connect", (request, response) => {
         const params = request.body;
         const data = {};
 
         Promise.resolve(dbOperations.createConnection(params.ip))
-               .then(() => dbOperations.connect())
-               .then(() => accountManager.logIn(params.username, params.password))
-               .then(() => {
-                   logger.log("Fetching assets...");
-                   return assetManager.getFullAssets();
-               })
-               .then((assets) => {
-                   data.assets = assets;
-                   return dbOperations.getAllCategories();
-               })
-               .then((categories) => {
-                   data.categories = categories;
-                   return dbOperations.getAllSites();
-               })
-               .then((sites) => {
-                   data.sites = sites;
-                   console.log("Full front end data");
-                   console.log(data);
-                   return response.render("user_home_page.ejs", data);
-               })
-               .catch((err) => response.render("index.ejs", {error: err.message}));
+            .then(() => dbOperations.connect())
+            .then(() => accountManager.logIn(params.username, params.password))
+            .then(() => {
+                logger.log("Fetching assets...");
+                return assetManager.getFullAssets();
+            })
+            .then((assets) => {
+                data.assets = assets;
+                return dbOperations.getAllCategories();
+            })
+            .then((categories) => {
+                data.categories = categories;
+                return dbOperations.getAllSites();
+            })
+            .then((sites) => {
+                data.sites = sites;
+                console.log("Full front end data");
+                console.log(data);
+                return response.render("user_home_page.ejs", data);
+            })
+            .catch((err) => response.render("index.ejs", {error: err.message}));
     });
 
     expressApp.post("/create_user", (request, response) => {
         var params = request.body;
 
         Promise.resolve(dbOperations.createConnection(params.ip))
-               .then(() => dbOperations.connect())
-               .then(() => accountManager.signUp(params.username, params.password))
-               .then(() => response.render("index.ejs", {success: true}))
-               .catch((err) => response.render("index.ejs", {error: err.message}));
+            .then(() => dbOperations.connect())
+            .then(() => accountManager.signUp(params.username, params.password))
+            .then(() => response.render("index.ejs", {success: true}))
+            .catch((err) => response.render("index.ejs", {error: err.message}));
     });
 
     expressApp.get("/add_asset_page", (request, response) => {
