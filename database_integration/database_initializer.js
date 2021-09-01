@@ -106,11 +106,11 @@ function _deleteDatabase(dbConnection, dbName) {
 
     // Construct query string and pass it to the connection object to query the database
     return dbConnection.query(`DROP DATABASE IF EXISTS ${dbName}`)
-                       .then((result) => {
-                           logger.log(`Cleaned existing database, if any`);
-                           return Promise.resolve(result);
-                       })
-                       .catch((err) => Promise.reject(new DbOperationError(`Deleting database ${dbName} failed\n\n:${err.stack}`)));
+        .then((result) => {
+            logger.log(`Cleaned existing database, if any`);
+            return Promise.resolve(result);
+        })
+        .catch((err) => Promise.reject(new DbOperationError(`Deleting database ${dbName} failed\n\n:${err.stack}`)));
 }
 
 // Creates a database, provided a connection object and a name
@@ -121,11 +121,11 @@ function _createDatabase(dbConnection, dbName) {
 
     // Construct query string and pass it to the connection object to query the database
     return dbConnection.query(`CREATE DATABASE IF NOT EXISTS ${dbName}`)
-                       .then((result) => {
-                           logger.log(`Created new database '${dbName}'`);
-                           return Promise.resolve(result);
-                       })
-                       .catch((err) => Promise.reject(new DbOperationError(`Creating database with name ${dbName} failed\n\n:${err.stack}`)));
+        .then((result) => {
+            logger.log(`Created new database '${dbName}'`);
+            return Promise.resolve(result);
+        })
+        .catch((err) => Promise.reject(new DbOperationError(`Creating database with name ${dbName} failed\n\n:${err.stack}`)));
 }
 
 // Select the name of the database to use (need to do so before querying any table commands)
@@ -136,11 +136,11 @@ function _useDatabase(dbConnection, dbName) {
 
     // Construct query string and pass it to the connection object to query the database
     return dbConnection.query(`USE ${dbName}`)
-                       .then((result) => {
-                           logger.log(`Selected database '${dbName}' to use`);
-                           return Promise.resolve(result);
-                       })
-                       .catch((err) => Promise.reject(new DbOperationError(`Selecting database to use with name ${dbName} failed\n\n:${err.stack}`)));
+        .then((result) => {
+            logger.log(`Selected database '${dbName}' to use`);
+            return Promise.resolve(result);
+        })
+        .catch((err) => Promise.reject(new DbOperationError(`Selecting database to use with name ${dbName} failed\n\n:${err.stack}`)));
 }
 
 // Take an object with keys that will act as the column keys, and values that will act as the
@@ -172,10 +172,10 @@ function _createTable(dbConnection, tableName, tableSchema) {
     }
 
     return dbConnection.query(`CREATE TABLE IF NOT EXISTS ${tableName} (\n${schemaStr}${foreignKeysStr}\n);`)
-                       .then((result) => {
-                           logger.log(`Created new table '${tableName}' with schema:`, tableSchema);
-                           return Promise.resolve(result);
-                       });
+        .then((result) => {
+            logger.log(`Created new table '${tableName}' with schema:`, tableSchema);
+            return Promise.resolve(result);
+        });
 }
 
 function _insertDummyData() {
@@ -185,20 +185,20 @@ function _insertDummyData() {
     const testAccount = require("../data/dummy_accounts.json")[0];
 
     return dbOperations.addSites(sites)
-                       .then((result) => {
-                           logger.log(`Finished adding dummy sites`);
-                           return dbOperations.addCategories(categories);
-                       })
-                       .then((result) => {
-                           logger.log(`Finished adding dummy categories`);
-                           return dbOperations.addAssets(assets);
-                       })
-                       .then((result) => {
-                           logger.log(`Finished adding dummy assets`);
-                           return accountManager.signUp(testAccount.username, testAccount.password);
-                       })
-                       .then((result) => {
-                           logger.log(`Finished adding dummy account`);
-                           return Promise.resolve();
-                       });
+        .then((result) => {
+            logger.log(`Finished adding dummy sites`);
+            return dbOperations.addCategories(categories);
+        })
+        .then((result) => {
+            logger.log(`Finished adding dummy categories`);
+            return dbOperations.addAssets(assets);
+        })
+        .then((result) => {
+            logger.log(`Finished adding dummy assets`);
+            return accountManager.signUp(testAccount.username, testAccount.password);
+        })
+        .then((result) => {
+            logger.log(`Finished adding dummy account`);
+            return Promise.resolve();
+        });
 }

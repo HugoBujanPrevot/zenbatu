@@ -47,8 +47,8 @@ module.exports.signUp = async (username, password) => {
 
     const hashedPassword = await hasher.hash(password);
     return dbOperations.addAccount(username, hashedPassword)
-                       .then((result) => {
-                           logger.log(`Signed up successfully!`);
-                           return Promise.resolve(result);
-                       });
+        .then((result) => {
+            logger.log(`Signed up successfully!`);
+            return Promise.resolve(result);
+        });
 };

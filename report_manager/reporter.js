@@ -29,6 +29,7 @@ module.exports.generateReport = async function () {
 
         logger.log("Generated asset report:", report);
         return report;
+
     } catch (err) {
         logger.log(`Error: ${err.message}`, err.stack);
     }
@@ -119,20 +120,26 @@ function _doesAssetNeedMaintenance(asset) {
     if (maintenanceSchedule === "weekly") {
         if (daysSinceMaintenance >= DAYS_IN_WEEK) return true;
         else return false;
+
     } else if (maintenanceSchedule === "biweekly") {
         if (daysSinceMaintenance >= DAYS_IN_WEEK * 2) return true;
         else return false;
+
     } else if (maintenanceSchedule === "monthly") {
         if (daysSinceMaintenance >= DAYS_IN_MONTH) return true;
         else return false;
+
     } else if (maintenanceSchedule === "bimonthly") {
         if (daysSinceMaintenance >= DAYS_IN_MONTH * 2) return true;
         else return false;
+        
     } else if (maintenanceSchedule === "quarterly") {
         if (daysSinceMaintenance >= DAYS_IN_QUARTER) return true;
         else return false;
+
     } else if (maintenanceSchedule === "annually") {
         if (daysSinceMaintenance >= DAYS_IN_YEAR) return true;
         else return false;
+        
     } else return false;
 }
