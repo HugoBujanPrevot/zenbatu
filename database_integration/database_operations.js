@@ -13,7 +13,7 @@ const logger = require("../logger/logger");
 const dbSchema = require("../data/db_schema.json");
 const dbConnection = require("./database_connection");
 const dbInitializer = require("./database_initializer");
-const DbOperationError = require("../errors/db_operation_error");
+const { DbOperationError } = require("../errors/custom_errors");
 
 
 module.exports.createConnection = (hostIp, username, password) => {
