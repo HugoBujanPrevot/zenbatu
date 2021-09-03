@@ -1,7 +1,7 @@
 const logger = require("../logger/logger");
 const dbSchema = require("../data/db_schema.json");
 const dbOperations = require("./database_operations");
-const DbOperationError = require("../errors/db_operation_error");
+const { DbOperationError } = require("../errors/custom_errors");
 const accountManager = require("../account_manager/account_manager");
 
 module.exports.initializeDb = (dbConnection) => {
