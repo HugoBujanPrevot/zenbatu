@@ -9,6 +9,8 @@ To start contributing, make sure you install [Git](https://git-scm.com/downloads
 2. Once the repository is cloned, in the same console window, type `npm install`. This will automatically install all of the required node packages specified in the package.json file.
 3. You can start working on the project now. If you don't know how to use Git, there are a few [guides](https://github.com/git-guides) that can help.
 
+## How to Package the App into an Exe file
+The pkg module is included in the application. If you followed the steps above and ran the `npm install` command, you can open a cmd window on the directory of the repository and run the command `pkg zenbatu.js`. This will package the application into an executable file for each platform that you can then run.
 
 ## How to Run the App
 To run the application, once NodeJS is installed, you can use the same console window that was mentioned above to run the command "node index.js". This will launch a browser window with the app's front-end. If you're using Visual Studio Code (which I recommend) as your IDE, you can also use its built-in terminal to run these commands (got to Terminal at the top, then 'New Terminal').
