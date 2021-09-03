@@ -38,11 +38,13 @@ module.exports.initRoutes = function (expressApp) {
             })
             .then((sites) => {
                 data.sites = sites;
-                console.log("Full front end data");
-                console.log(data);
                 return response.render("user_home_page.ejs", data);
             })
-            .catch((err) => response.render("index.ejs", {error: err.message}));
+            .catch((err) => 
+            {
+                logger.log(`Error occurred:`, err);
+                response.render("index.ejs", {error: err.message})
+            });
     });
 
     expressApp.post("/create_user", (request, response) => {
