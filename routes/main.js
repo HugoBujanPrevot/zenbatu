@@ -17,8 +17,8 @@ module.exports.initRoutes = function (expressApp) {
         response.render("database.ejs");
     });
 
-    expressApp.get("/connect", (request, response) => {
-        const params = request.query;
+    expressApp.post("/connect", (request, response) => {
+        const params = request.body;
         const data = {};
 
         Promise.resolve(dbOperations.createConnection(params.ip))
