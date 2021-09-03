@@ -182,7 +182,7 @@ function _insertDummyData() {
     const assets = require("../data/dummy_assets.json");
     const categories = require("../data/dummy_categories.json");
     const sites = require("../data/dummy_sites.json");
-    const testAccount = require("../data/dummy_accounts.json")[0];
+    const testAccounts = require("../data/dummy_accounts.json");
 
     return dbOperations.addSites(sites)
         .then((result) => {
@@ -193,12 +193,19 @@ function _insertDummyData() {
             logger.log(`Finished adding dummy categories`);
             return dbOperations.addAssets(assets);
         })
-        .then((result) => {
+        .then(async (result) => {
             logger.log(`Finished adding dummy assets`);
-            return accountManager.signUp(testAccount.username, testAccount.password);
+
+            for (var i = 0; i < testAccounts.length; i++)
+            {
+                const account = testAccounts[i];
+                await accountManager.signUp(account.username, account.password);
+            }
+
+            return Promise.resolve();
         })
         .then((result) => {
-            logger.log(`Finished adding dummy account`);
+            logger.log(`Finished adding dummy accounts`);
             return Promise.resolve();
         });
 }
