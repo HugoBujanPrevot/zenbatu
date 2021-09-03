@@ -4,12 +4,20 @@ const dbOperations = require("../database_integration/database_operations");
 
 
 module.exports.addAsset = (assetData) => {
-    const assetDataWithId = Object.assign(assetData, {asset_id: idGenerator.generateId()});
+    return exports.addAssets([ assetData ]);
+};
 
-    return dbOperations.addAsset(assetDataWithId)
+module.exports.addAssets = (assets) => {
+
+    if (Array.isArray(assets) === false)
+        return Promise.reject(new TypeError(`Expected array of assets, got ${typeof assets} instead.`));
+
+    assets.map((assetData) => Object.assign(assetData, {asset_id: idGenerator.generateId()}));
+
+    return dbOperations.addAssets(assets)
         .catch((err) => {
             logger.log(`Error: ${err.message}`, err.stack);
-            return Promise.reject(new Error(`Error occurred when adding the asset to the database.`));
+            return Promise.reject(new Error(`Error occurred when adding assets to the database.`));
         });
 };
 
@@ -27,4 +35,29 @@ module.exports.getFullAssets = () => {
             logger.log(`Error: ${err.message}`, err.stack);
             return Promise.reject(new Error(`Error occurred when getting the full assets from the database.`));
         });
+};
+
+module.exports.addCategories = (arrOfCategoryObjects) => {
+    if (Array.isArray(arrOfCategoryObjects) === false)
+        throw new TypeError(`Expected array of categories, got ${typeof arrOfCategoryObjects} instead.`);
+
+    if (arrOfCategoryObjects.length <= 0)
+        throw new Error(`Array of categories is empty.`);
+
+    return dbOperations.addCategories(arrOfCategoryObjects);
+};
+
+module.exports.addSites = (arrOfSiteObjects) => {
+    if (Array.isArray(arrOfSiteObjects) === false)
+        throw new TypeError(`Expected array of categories, got ${typeof arrOfSiteObjects} instead.`);
+
+    if (arrOfSiteObjects.length <= 0)
+        throw new Error(`Array of categories is empty.`);
+
+    return dbOperations.addSites(arrOfSiteObjects);
+};
+
+// Add a location to an existing site
+module.exports.addLocation = (siteId, locationName) => {
+    return dbOperations.addLocation(siteId, locationName);
 };
