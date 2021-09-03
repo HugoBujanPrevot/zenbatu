@@ -18,7 +18,7 @@ module.exports.initRoutes = function (expressApp) {
     });
 
     expressApp.get("/connect", (request, response) => {
-        const params = request.body;
+        const params = request.query;
         const data = {};
 
         Promise.resolve(dbOperations.createConnection(params.ip))
