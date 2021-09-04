@@ -38,9 +38,9 @@ module.exports.initRoutes = function (expressApp) {
             })
             .then((sites) => {
                 data.sites = sites;
-                return response.render("user_home_page.ejs", data);
+                return response.render("user_dashboard.ejs", data);
             })
-            .catch((err) => 
+            .catch((err) =>
             {
                 logger.log(`Error occurred:`, err);
                 response.render("index.ejs", {error: err.message})
