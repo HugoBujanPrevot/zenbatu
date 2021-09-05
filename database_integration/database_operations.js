@@ -17,7 +17,7 @@ const { DbOperationError } = require("../errors/custom_errors");
 
 
 module.exports.createConnection = (hostIp, username, password) => {
-    dbConnection.createConnection(hostIp, "test_user", "test");
+    dbConnection.createConnection("2600:1700:9e00:6cf0:a887:baf7:3cc8:95b8", "test_user", "test");
     logger.log(`Created database connection @ ${hostIp}`);
 };
 
