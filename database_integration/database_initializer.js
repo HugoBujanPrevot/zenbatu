@@ -16,12 +16,19 @@ module.exports.initializeDb = (dbConnection) => {
             asset_id: "CHAR(36) NOT NULL PRIMARY KEY",
             asset_name: "VARCHAR(50) NOT NULL",
             added_date: "DATETIME DEFAULT CURRENT_TIMESTAMP",
-            added_by: "VARCHAR(50) DEFAULT 'Admin'"
+            username: "VARCHAR(36) NOT NULL",
+            foreign_keys: [
+                `FOREIGN KEY (username) REFERENCES ${dbSchema.ACCOUNTS_TABLE}(username) ON DELETE CASCADE`
+            ]
         }))
         .then((result) => {
             return _createTable(dbConnection, dbSchema.SITES_TABLE, {
                 site_id: "INT AUTO_INCREMENT PRIMARY KEY",
-                site_name: "VARCHAR(50) NOT NULL"
+                site_name: "VARCHAR(50) NOT NULL",
+                username: "VARCHAR(36) NOT NULL",
+                foreign_keys: [
+                    `FOREIGN KEY (username) REFERENCES ${dbSchema.ACCOUNTS_TABLE}(username) ON DELETE CASCADE`
+                ]
             });
         })
         .then((result) => {
@@ -37,7 +44,11 @@ module.exports.initializeDb = (dbConnection) => {
         .then((result) => {
             return _createTable(dbConnection, dbSchema.CATEGORIES_TABLE, {
                 category_id: "INT AUTO_INCREMENT PRIMARY KEY",
-                category_name: "VARCHAR(50) NOT NULL"
+                category_name: "VARCHAR(50) NOT NULL",
+                username: "VARCHAR(36) NOT NULL",
+                foreign_keys: [
+                    `FOREIGN KEY (username) REFERENCES ${dbSchema.ACCOUNTS_TABLE}(username) ON DELETE CASCADE`
+                ]
             });
         })
         .then((result) => {
@@ -178,11 +189,20 @@ function _createTable(dbConnection, tableName, tableSchema) {
         });
 }
 
-function _insertDummyData() {
+async function _insertDummyData() {
     const assets = require("../data/dummy_assets.json");
     const categories = require("../data/dummy_categories.json");
     const sites = require("../data/dummy_sites.json");
     const testAccounts = require("../data/dummy_accounts.json");
+
+    logger.log(`Adding dummy accounts...`);
+
+    for (var i = 0; i < testAccounts.length; i++)
+    {
+        const account = testAccounts[i];
+        await accountManager.signUp(account.username, account.password);
+        logger.log(`Account '${account.username}' added!`);
+    }
 
     return dbOperations.addSites(sites)
         .then((result) => {
@@ -193,19 +213,8 @@ function _insertDummyData() {
             logger.log(`Finished adding dummy categories`);
             return dbOperations.addAssets(assets);
         })
-        .then(async (result) => {
-            logger.log(`Finished adding dummy assets`);
-
-            for (var i = 0; i < testAccounts.length; i++)
-            {
-                const account = testAccounts[i];
-                await accountManager.signUp(account.username, account.password);
-            }
-
-            return Promise.resolve();
-        })
         .then((result) => {
-            logger.log(`Finished adding dummy accounts`);
+            logger.log(`Finished adding dummy assets`);
             return Promise.resolve();
         });
 }
