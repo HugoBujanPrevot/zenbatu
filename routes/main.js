@@ -17,6 +17,26 @@ module.exports.initRoutes = function (expressApp) {
         response.render("database.ejs");
     });
 
+    expressApp.get("/connectionState", (request, response) => {
+        response.send(dbOperations.getConnectionState());
+    });
+
+    expressApp.post("/loggedIn", (request, response) => {
+        const params = request.body;
+
+        accountManager.checkIfLoggedIn(params.username, params.password)
+            .then((isLoggedIn) => response.send({ success: true, data: isLoggedIn }))
+            .catch((err) => response.send({ success: false, err: err.message }));
+    });
+
+    expressApp.post("/logOut", (request, response) => {
+        const params = request.body;
+
+        accountManager.logOut(params.username, params.password)
+            .then(() => response.redirect("/"))
+            .catch((err) => response.send({ success: false, err: err.message }));
+    });
+
     expressApp.post("/connect", (request, response) => {
         const params = request.body;
         const data = {};
@@ -25,16 +45,16 @@ module.exports.initRoutes = function (expressApp) {
             .then(() => dbOperations.connect())
             .then(() => accountManager.logIn(params.username, params.password))
             .then(() => {
-                logger.log("Fetching assets...");
-                return assetManager.getFullAssets();
+                logger.log(`Fetching assets for username ${params.username}...`);
+                return assetManager.getFullAssets(params.username);
             })
             .then((assets) => {
                 data.assets = assets;
-                return dbOperations.getAllCategories();
+                return dbOperations.getAllCategories(params.username);
             })
             .then((categories) => {
                 data.categories = categories;
-                return dbOperations.getAllSites();
+                return dbOperations.getAllSites(params.username);
             })
             .then((sites) => {
                 data.sites = sites;
@@ -43,18 +63,18 @@ module.exports.initRoutes = function (expressApp) {
             .catch((err) =>
             {
                 logger.log(`Error occurred:`, err);
-                response.render("index.ejs", {error: err.message})
+                response.render("user_dashboard.ejs", { err: err.message });
             });
     });
 
     expressApp.post("/create_user", (request, response) => {
-        var params = request.body;
+        const params = request.body;
 
         Promise.resolve(dbOperations.createConnection(params.ip))
             .then(() => dbOperations.connect())
             .then(() => accountManager.signUp(params.username, params.password))
-            .then(() => response.render("index.ejs", {success: true}))
-            .catch((err) => response.render("index.ejs", {error: err.message}));
+            .then(() => response.send({success: true }))
+            .catch((err) => response.send({ success: false, err: err.message } ));
     });
 
     expressApp.get("/add_asset_page", (request, response) => {
@@ -65,19 +85,25 @@ module.exports.initRoutes = function (expressApp) {
         response.render("get_asset_page.ejs");
     });
 
-    expressApp.get("/get_asset", (request, response) => {
-        logger.log(`User requested the following asset:\n\n`, request.query);
+    expressApp.post("/get_asset", (request, response) => {
+        logger.log(`User requested the following asset:\n\n`, request.body);
+        const params = request.body;
 
         return assetManager.getAsset({
-            name: request.query.name,
-            id: request.query.id
-        });
+            name: params.name,
+            id: params.id,
+            username: params.username
+        })
+            .then((result) => response.send({ success: true, data: result }))
+            .catch((err) => response.send({ success: false, err: err.message }));
     });
 
     expressApp.post("/add_asset", (request, response) => {
-        var assetData = request.body;
+        const assetData = request.body;
 
         logger.log(`User sent the following asset data:\n\n`, assetData);
-        return assetManager.addAsset(assetData.name);
+        return assetManager.addAsset(assetData)
+            .then((result) => response.send({ success: true }))
+            .catch((err) => response.send({ success: false, err: err.message }));
     });
 }
