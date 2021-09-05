@@ -5,159 +5,167 @@
 
     <%- include('./partials/navbar.ejs')-%>
 
-    <div id="dashboardDiv" class="d-flex flex-column">
+    <section id="connect" class="connect">
 
-        <div class="d-flex flex-row">
+        <div class="container" data-aos="fade-up">
 
-            <div class="card">
-                <div class="card-header">
-                    <h4>Add Asset</h4>
+            <div id="dashboardDiv" class="d-flex flex-column">
+
+                <div class="d-flex flex-row">
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>Add Asset</h4>
+                        </div>
+
+                        <div class="card-body">
+                            <form id="addAssetForm" action="/add_asset" method="POST">
+                                <input id="assetNameInput" name="asset_name" type="text" placeholder="Name" required>
+                                <input id="assetBrandInput" name="brand" type="text" placeholder="Brand, i.e. Apple" required>
+                                <input id="assetModelInput" name="model" type="text" placeholder="Model, i.e. A2338" required>
+                                <input id="assetSerialInput" name="serial_no" type="text" placeholder="Serial No" required>
+                                <input id="assetPurchaseDateInput" name="purchase_date" type="date" required>
+                                <input id="assetCostInput" name="cost" type="number" required>
+                                <input id="assetVendorInput" name="vendor" type="text" placeholder="Vendor, i.e. Amazon" required>
+                                <input id="assetLifeInput" name="useful_life" type="number" required>
+
+                                <select id="assetMaintenanceInput" name="maintenance_schedule" required>
+                                    <option value="weekly">Weekly</option>
+                                    <option value="biweekly">Biweekly</option>
+                                    <option value="monthly">Monthly</option>
+                                    <option value="quarterly">Quarterly</option>
+                                </select>
+
+                                <select id="assetCategoryInput" name="category" required>
+
+                                    <% if (typeof categories === "object" && Array.isArray(categories) === true) { %>
+
+                                    <% categories.forEach((category) => { %>
+                                    <option value=<%=category.category_id %>><%=category.category_name %></option>
+                                    <% }); %>
+
+                                    <% } %>
+                                </select>
+
+
+                                <select id="assetSiteInput" name="site" required>
+
+                                    <% if (typeof sites === "object" && Array.isArray(sites) === true) { %>
+
+                                    <% sites.forEach((site) => { %>
+                                    <option value=<%=site.location_id %>><%=`${site.site_name} - ${site.location_name}` %></option>
+                                    <% }); %>
+
+                                    <% } %>
+                                </select>
+
+                                <input type="submit" value="Add" >
+                            </form>
+                        </div>
+
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>Add Category</h4>
+                        </div>
+
+                        <div class="card-body">
+                            <form id="addAssetForm" action="/add_category" method="POST">
+                                <input id="assetNameInput" name="name" type="text" placeholder="Asset Name">
+                                <input type="submit" value="Add" >
+                            </form>
+                        </div>
+
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>Add Site</h4>
+                        </div>
+
+                        <div class="card-body">
+                            <form id="addAssetForm" action="/add_site" method="POST">
+                                <input id="assetNameInput" name="name" type="text" placeholder="Asset Name">
+                                <input type="submit" value="Add" >
+                            </form>
+                        </div>
+
+                    </div>
                 </div>
 
-                <div class="card-body">
-                    <form id="addAssetForm" action="/add_asset" method="POST">
-                        <input id="assetNameInput" name="asset_name" type="text" placeholder="Name" required>
-                        <input id="assetBrandInput" name="brand" type="text" placeholder="Brand, i.e. Apple" required>
-                        <input id="assetModelInput" name="model" type="text" placeholder="Model, i.e. A2338" required>
-                        <input id="assetSerialInput" name="serial_no" type="text" placeholder="Serial No" required>
-                        <input id="assetPurchaseDateInput" name="purchase_date" type="date" required>
-                        <input id="assetCostInput" name="cost" type="number" required>
-                        <input id="assetVendorInput" name="vendor" type="text" placeholder="Vendor, i.e. Amazon" required>
-                        <input id="assetLifeInput" name="useful_life" type="number" required>
+                <!-- DataTables stylesheet (required for table sorting icons and others) -->
+                <link rel="stylesheet" href="https://cdn.datatables.net/1.11.1/css/dataTables.bootstrap4.min.css">
 
-                        <select id="assetMaintenanceInput" name="maintenance_schedule" required>
-                            <option value="weekly">Weekly</option>
-                            <option value="biweekly">Biweekly</option>
-                            <option value="monthly">Monthly</option>
-                            <option value="quarterly">Quarterly</option>
-                        </select>
+                <!-- jQuery (required for DataTables) -->
+                <script
+                    src="https://code.jquery.com/jquery-3.6.0.min.js"
+                    integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+                    crossorigin="anonymous">
+                </script>
 
-                        <select id="assetCategoryInput" name="category" required>
+                <!-- Popper (required for DataTables) -->
+                <script
+                    src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.6.0/umd/popper.min.js"
+                    integrity="sha512-BmM0/BQlqh02wuK5Gz9yrbe7VyIVwOzD1o40yi1IsTjriX/NGF37NyXHfmFzIlMmoSIBXgqDiG1VNU6kB5dBbA=="
+                    crossorigin="anonymous"
+                    referrerpolicy="no-referrer">
+                </script>
 
-                            <% if (typeof categories === "object" && Array.isArray(categories) === true) { %>
+                <!-- DataTables scripts (required for them to have functionality) -->
+                <script src="https://cdn.datatables.net/1.11.1/js/jquery.dataTables.min.js"></script>
+                <script src="https://cdn.datatables.net/1.11.1/js/dataTables.bootstrap4.min.js"></script>
 
-                            <% categories.forEach((category) => { %>
-                            <option value=<%=category.category_id %>><%=category.category_name %></option>
-                            <% }); %>
+                <table id="assetTable" class="table table-striped table-bordered" style="width: 100%">
+                    <thead>
+                        <tr>
+                            <th colspan="1" rowspan="2">Id</th>
+                            <th colspan="1" rowspan="2">Name</th>
+                            <th colspan="1" rowspan="2">Category</th>
+                            <th colspan="2">Type</th>
+                            <th colspan="2">Location</th>
+                        </tr>
 
-                            <% } %>
-                        </select>
+                        <tr>
+                            <th class="th-sm" data-sortable="true">Brand</th>
+                            <th class="th-sm" data-sortable="true">Model</th>
+                            <th class="th-sm" data-sortable="true">Site</th>
+                            <th class="th-sm" data-sortable="true">Location</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (typeof assets === "object" && Array.isArray(assets) === true) { %>
 
+                        <% assets.forEach((asset) => { %>
 
-                        <select id="assetSiteInput" name="site" required>
+                        <% console.log(asset) %>
 
-                            <% if (typeof sites === "object" && Array.isArray(sites) === true) { %>
+                        <tr>
+                            <td><%=asset.asset_id %></td>
+                            <td><%=asset.asset_name %></td>
+                            <td><%=asset.category_name %></td>
+                            <td><%=asset.brand %></td>
+                            <td><%=asset.model %></td>
+                            <td><%=asset.site_name %></td>
+                            <td><%=asset.location_name %></td>
+                        </tr>
 
-                            <% sites.forEach((site) => { %>
-                            <option value=<%=site.location_id %>><%=`${site.site_name} - ${site.location_name}` %></option>
-                            <% }); %>
+                        <% }); %>
+                        <% } %>
+                    </tbody>
+                </table>
 
-                            <% } %>
-                        </select>
-
-                        <input type="submit" value="Add" >
-                    </form>
-                </div>
+                <script>
+                    $("#assetTable").DataTable({
+                        pagingType: "full"
+                    });
+                </script>
 
             </div>
 
-            <div class="card">
-                <div class="card-header">
-                    <h4>Add Category</h4>
-                </div>
-
-                <div class="card-body">
-                    <form id="addAssetForm" action="/add_category" method="POST">
-                        <input id="assetNameInput" name="name" type="text" placeholder="Asset Name">
-                        <input type="submit" value="Add" >
-                    </form>
-                </div>
-
-            </div>
-
-            <div class="card">
-                <div class="card-header">
-                    <h4>Add Site</h4>
-                </div>
-
-                <div class="card-body">
-                    <form id="addAssetForm" action="/add_site" method="POST">
-                        <input id="assetNameInput" name="name" type="text" placeholder="Asset Name">
-                        <input type="submit" value="Add" >
-                    </form>
-                </div>
-
-            </div>
         </div>
 
-        <!-- DataTables stylesheet (required for table sorting icons and others) -->
-        <link rel="stylesheet" href="https://cdn.datatables.net/1.11.1/css/dataTables.bootstrap4.min.css">
-
-        <!-- jQuery (required for DataTables) -->
-        <script
-            src="https://code.jquery.com/jquery-3.6.0.min.js"
-            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
-            crossorigin="anonymous">
-        </script>
-
-        <!-- Popper (required for DataTables) -->
-        <script 
-            src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.6.0/umd/popper.min.js" 
-            integrity="sha512-BmM0/BQlqh02wuK5Gz9yrbe7VyIVwOzD1o40yi1IsTjriX/NGF37NyXHfmFzIlMmoSIBXgqDiG1VNU6kB5dBbA==" 
-            crossorigin="anonymous" 
-            referrerpolicy="no-referrer">
-        </script>
-
-        <!-- DataTables scripts (required for them to have functionality) -->
-        <script src="https://cdn.datatables.net/1.11.1/js/jquery.dataTables.min.js"></script>
-        <script src="https://cdn.datatables.net/1.11.1/js/dataTables.bootstrap4.min.js"></script>
-
-        <table id="assetTable" class="table table-striped table-bordered" style="width: 100%">
-            <thead>
-                <tr>
-                    <th colspan="1" rowspan="2">Id</th>
-                    <th colspan="1" rowspan="2">Name</th>
-                    <th colspan="1" rowspan="2">Category</th>
-                    <th colspan="2">Type</th>
-                    <th colspan="2">Location</th>
-                </tr>
-
-                <tr>
-                    <th class="th-sm" data-sortable="true">Brand</th>
-                    <th class="th-sm" data-sortable="true">Model</th>
-                    <th class="th-sm" data-sortable="true">Site</th>
-                    <th class="th-sm" data-sortable="true">Location</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% if (typeof assets === "object" && Array.isArray(assets) === true) { %>
-
-                <% assets.forEach((asset) => { %>
-
-                <% console.log(asset) %>
-
-                <tr>
-                    <td><%=asset.asset_id %></td>
-                    <td><%=asset.asset_name %></td>
-                    <td><%=asset.category_name %></td>
-                    <td><%=asset.brand %></td>
-                    <td><%=asset.model %></td>
-                    <td><%=asset.site_name %></td>
-                    <td><%=asset.location_name %></td>
-                </tr>
-
-                <% }); %>
-                <% } %>
-            </tbody>
-        </table>
-
-        <script>
-            $("#assetTable").DataTable({
-                pagingType: "full"
-            });
-        </script>
-
-    </div>
+    </section>
 
     <%- include('./partials/footer.ejs')-%>
 
