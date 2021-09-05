@@ -7,6 +7,8 @@ const { LoginError } = require("../errors/custom_errors");
 const USERNAME_REGEX = new RegExp(/^\w|\d|_{3, 50}$/);
 const PASSWORD_REGEX = new RegExp(/^\w+|\d*|(\!|\@|\#|\$|\%|\&|\*|\-|\_)+{3, 50}$/);
 
+const ACTIVE_SESSIONS = [];
+
 
 module.exports.logIn = async (username, password) => {
     logger.log(`Attempting to log in with username '${username}'...`);
@@ -17,6 +19,19 @@ module.exports.logIn = async (username, password) => {
     }
 
     try {
+        await exports.checkCredentials(username, password);
+        ACTIVE_SESSIONS.push(username);
+        return Promise.resolve();
+    } catch (err) {
+        logger.log(`Error occurred while logging in:`, err);
+        return Promise.reject(err);
+    }
+};
+
+module.exports.checkCredentials = async (username, password) => {
+    logger.log(`Checking credentials for sername '${username}'...`);
+
+    try {
         const account = await dbOperations.getAccount(username);
         const isPasswordCorrect = await hasher.comparePasswordToHash(password, account.password);
 
@@ -25,12 +40,24 @@ module.exports.logIn = async (username, password) => {
             return Promise.reject(new LoginError(`The password is incorrect.`));
         }
 
-        logger.log(`Log in successful!`);
+        logger.log(`Credentials match!`);
         return Promise.resolve();
     } catch (err) {
-        logger.log(`Error occurred while logging in:`, err);
+        logger.log(`Error occurred while checking credentials:`, err);
         return Promise.reject(err);
     }
+};
+
+module.exports.logOut = async (username, password) =>
+{
+    await exports.checkCredentials(username, password);
+    ACTIVE_SESSIONS.splice(ACTIVE_SESSIONS.indexOf(username), 1);
+};
+
+module.exports.checkIfLoggedIn = async (username) =>
+{
+    await exports.checkCredentials(username, password);
+    return ACTIVE_SESSIONS.includes(username);
 };
 
 module.exports.signUp = async (username, password) => {
