@@ -21,16 +21,16 @@ module.exports.addAssets = (assets) => {
         });
 };
 
-module.exports.getAsset = ({name, id}) => {
-    return dbOperations.getAsset((id != null) ? id : name)
+module.exports.getAsset = ({name, id, username}) => {
+    return dbOperations.getAsset((id != null) ? id : name, username)
         .catch((err) => {
             logger.log(`Error: ${err.message}`, err.stack);
             return Promise.reject(new Error(`Error occurred when getting the asset from the database.`));
         });
 };
 
-module.exports.getFullAssets = () => {
-    return dbOperations.getFullAssets()
+module.exports.getFullAssets = (username) => {
+    return dbOperations.getFullAssets(username)
         .catch((err) => {
             logger.log(`Error: ${err.message}`, err.stack);
             return Promise.reject(new Error(`Error occurred when getting the full assets from the database.`));

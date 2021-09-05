@@ -30,6 +30,10 @@ module.exports.connect = () => {
         .then(() => logger.log(`Database initialized with dummy data`));
 };
 
+module.exports.getConnectionState = () => {
+    return dbConnection.getState();
+};
+
 
 module.exports.addAccount = (username, password) => {
     return dbConnection.query(`INSERT INTO ${dbSchema.ACCOUNTS_TABLE} (username, password) VALUES ('${username}', '${password}');`)
@@ -51,7 +55,7 @@ module.exports.addAssets = (arrOfAssetObjects) => {
     var queryStr = "";
 
     arrOfAssetObjects.forEach((assetObj, i) => {
-        queryStr += `\nINSERT INTO ${dbSchema.ASSET_TABLE} (asset_id, asset_name) VALUES ('${assetObj.asset_id}', '${assetObj.asset_name}');\n` +
+        queryStr += `\nINSERT INTO ${dbSchema.ASSET_TABLE} (asset_id, asset_name, username) VALUES ('${assetObj.asset_id}', '${assetObj.asset_name}', '${assetObj.username}');\n` +
             `INSERT INTO ${dbSchema.ASSET_LOCATION_TABLE} (asset_id, site_id, location_id) VALUES ('${assetObj.asset_id}', '${assetObj.site_id}', '${assetObj.location_id}');\n` +
             `INSERT INTO ${dbSchema.ASSET_TYPE_TABLE} (asset_id, brand, model, serial_no, category_id) VALUES ('${assetObj.asset_id}', '${assetObj.brand}', '${assetObj.model}', '${assetObj.serial_no}', '${assetObj.category_id}');\n` +
             `INSERT INTO ${dbSchema.ASSET_PURCHASE_TABLE} (asset_id, purchase_date, cost, vendor, useful_life) VALUES ('${assetObj.asset_id}', '${assetObj.purchase_date}', '${assetObj.cost}', '${assetObj.vendor}', '${assetObj.useful_life}');\n` +
@@ -68,11 +72,11 @@ module.exports.addAssets = (arrOfAssetObjects) => {
 
 // Add asset categories to the database
 module.exports.addCategories = (arrOfCategoryObjects) => {
-    var queryStr = `INSERT INTO ${dbSchema.CATEGORIES_TABLE} (category_name) VALUES `;
+    var queryStr = `INSERT INTO ${dbSchema.CATEGORIES_TABLE} (category_name, username) VALUES `;
 
     arrOfCategoryObjects.forEach((categoryObj, i) => {
         if (i > 0) queryStr += ",";
-        queryStr += `('${categoryObj.category_name}')`;
+        queryStr += `('${categoryObj.category_name}', '${categoryObj.username}')`;
     });
 
     return dbConnection.query(queryStr)
@@ -88,7 +92,7 @@ module.exports.addSites = (arrOfSiteObjects) => {
     var queryStr = "";
 
     arrOfSiteObjects.forEach((siteObj) => {
-        queryStr += `INSERT INTO ${dbSchema.SITES_TABLE} (site_name) VALUES ('${siteObj.site_name}');\n` +
+        queryStr += `INSERT INTO ${dbSchema.SITES_TABLE} (site_name, username) VALUES ('${siteObj.site_name}', '${siteObj.username}');\n` +
             `SET @site_id = LAST_INSERT_ID();\n`;
 
 
@@ -148,11 +152,11 @@ module.exports.deleteAccount = (username) => {
         .catch((err) => Promise.reject(new DbOperationError(`Failed to delete account with username ${username}\n\n:${err.stack}`)));
 };
 
-module.exports.deleteAsset = (assetId) => {
+module.exports.deleteAsset = (assetId, username) => {
     // All sub-tables (AssetLocation, AssetPurchase, etc.) where asset_id is a foreign key should be
     // defined with the ON DELETE CASCADE constraint, so that when an asset is deleted on the Assets
     // table, all the rows on the sub-tables belonging to the same asset will also be deleted
-    return dbConnection.query(`DELETE FROM ${dbSchema.ASSET_TABLE} WHERE asset_id = ${assetId}`)
+    return dbConnection.query(`DELETE FROM ${dbSchema.ASSET_TABLE} WHERE asset_id = '${assetId}' AND username = '${username}'`)
         .then((result) => {
             logger.log(`Asset with id ${assetId} deleted from database`);
             return Promise.resolve(result);
@@ -160,11 +164,11 @@ module.exports.deleteAsset = (assetId) => {
         .catch((err) => Promise.reject(new DbOperationError(`Failed to delete asset with id ${assetId}\n\n:${err.stack}`)));
 };
 
-module.exports.deleteAssets = (assetIds) => {
+module.exports.deleteAssets = (assetIds, username) => {
     // All sub-tables (AssetLocation, AssetPurchase, etc.) where asset_id is a foreign key should be
     // defined with the ON DELETE CASCADE constraint, so that when an asset is deleted on the Assets
     // table, all the rows on the sub-tables belonging to the same asset will also be deleted
-    return dbConnection.query(`DELETE FROM ${dbSchema.ASSET_TABLE} WHERE asset_id IN (${assetIds.join(",")})`)
+    return dbConnection.query(`DELETE FROM ${dbSchema.ASSET_TABLE} WHERE asset_id IN ('${assetIds.join("','")}') AND username = '${username}'`)
         .then((result) => {
             logger.log(`Assets deleted from database:`, assetIds);
             return Promise.resolve(result);
@@ -172,11 +176,11 @@ module.exports.deleteAssets = (assetIds) => {
         .catch((err) => Promise.reject(new DbOperationError(`Failed to delete assets with ids ${assetIds}\n\n:${err.stack}`)));
 };
 
-module.exports.deleteAllAssets = () => {
+module.exports.deleteAllAssets = (username) => {
     // All sub-tables (AssetLocation, AssetPurchase, etc.) where asset_id is a foreign key should be
     // defined with the ON DELETE CASCADE constraint, so that when an asset is deleted on the Assets
     // table, all the rows on the sub-tables belonging to the same asset will also be deleted
-    return dbConnection.query(`DELETE FROM ${dbSchema.ASSET_TABLE}`)
+    return dbConnection.query(`DELETE FROM ${dbSchema.ASSET_TABLE} WHERE username = '${username}'`)
         .then((result) => {
             logger.log(`Deleted *all* assets from database`);
             return Promise.resolve(result);
@@ -194,8 +198,8 @@ module.exports.getAccount = (username) => {
         .catch((err) => Promise.reject(new DbOperationError(`Failed to get account\n\n:${err.stack}`)));
 };
 
-module.exports.getCategory = (id) => {
-    return dbConnection.query(`SELECT * FROM ${dbSchema.CATEGORIES_TABLE} WHERE category_id = '${id}';`)
+module.exports.getCategory = (id, username) => {
+    return dbConnection.query(`SELECT * FROM ${dbSchema.CATEGORIES_TABLE} WHERE category_id = '${id}' AND username = '${username}';`)
         .then((result) => {
             logger.log(`Fetched category with id ${id} from database`);
             return Promise.resolve(result[0]);
@@ -203,8 +207,8 @@ module.exports.getCategory = (id) => {
         .catch((err) => Promise.reject(new DbOperationError(`Failed to get category with id ${id}\n\n:${err.stack}`)));
 };
 
-module.exports.getAllCategories = () => {
-    return dbConnection.query(`SELECT * FROM ${dbSchema.CATEGORIES_TABLE};`)
+module.exports.getAllCategories = (username) => {
+    return dbConnection.query(`SELECT * FROM ${dbSchema.CATEGORIES_TABLE} WHERE username = '${username}';`)
         .then((result) => {
             logger.log(`Fetched all categories from database`);
             return Promise.resolve(result);
@@ -212,9 +216,9 @@ module.exports.getAllCategories = () => {
         .catch((err) => Promise.reject(new DbOperationError(`Failed to get all categories\n\n:${err.stack}`)));
 };
 
-module.exports.getSite = (id) => {
+module.exports.getSite = (id, username) => {
     return dbConnection.query(
-        `SELECT * FROM ${dbSchema.SITES_TABLE} WHERE site_id = '${id}'\n` +
+        `SELECT * FROM ${dbSchema.SITES_TABLE} WHERE site_id = '${id}' AND username = '${username}'\n` +
         `INNER JOIN ${dbSchema.LOCATIONS_TABLE} ON ${dbSchema.SITES_TABLE}.site_id = ${dbSchema.LOCATIONS_TABLE}.site_id;`
     )
         .then((result) => {
@@ -224,10 +228,11 @@ module.exports.getSite = (id) => {
         .catch((err) => Promise.reject(new DbOperationError(`Failed to get site with id ${id}\n\n:${err.stack}`)));
 };
 
-module.exports.getAllSites = () => {
+module.exports.getAllSites = (username) => {
     return dbConnection.query(
         `SELECT * FROM ${dbSchema.SITES_TABLE}\n` +
-        `INNER JOIN ${dbSchema.LOCATIONS_TABLE} ON ${dbSchema.SITES_TABLE}.site_id = ${dbSchema.LOCATIONS_TABLE}.site_id;`
+        `INNER JOIN ${dbSchema.LOCATIONS_TABLE} ON ${dbSchema.SITES_TABLE}.site_id = ${dbSchema.LOCATIONS_TABLE}.site_id\n` +
+        `WHERE ${dbSchema.SITES_TABLE}.username = '${username}';`
     )
         .then((result) => {
             logger.log(`Fetched all sites from database`);
@@ -237,9 +242,9 @@ module.exports.getAllSites = () => {
 };
 
 // Get all assets in the database and return them
-module.exports.getAsset = (assetNameOrId) => {
+module.exports.getAsset = (assetNameOrId, username) => {
     // Select an asset from the Assets table (check database diagram) and return the result
-    return dbConnection.query(`SELECT * FROM ${dbSchema.ASSET_TABLE} WHERE asset_name = '${assetNameOrId}' OR asset_id = '${assetNameOrId}'`)
+    return dbConnection.query(`SELECT * FROM ${dbSchema.ASSET_TABLE} WHERE (asset_name = '${assetNameOrId}' OR asset_id = '${assetNameOrId}') AND username = '${username}'`)
         .then((result) => {
             logger.log(`Fetched asset with identifier ${assetNameOrId} from database:`, result);
             return Promise.resolve(result);
@@ -248,9 +253,9 @@ module.exports.getAsset = (assetNameOrId) => {
 };
 
 // Get all assets in the database and return them
-module.exports.getAllAssetNames = () => {
+module.exports.getAllAssetNames = (username) => {
     // Select All from the Assets table (check database diagram) and return the result
-    return dbConnection.query(`SELECT * FROM ${dbSchema.ASSET_TABLE}`)
+    return dbConnection.query(`SELECT * FROM ${dbSchema.ASSET_TABLE} WHERE username = '${username}'`)
         .then((result) => {
             logger.log(`Fetched all asset names from database:`, result);
             return Promise.resolve(result);
@@ -259,23 +264,24 @@ module.exports.getAllAssetNames = () => {
 };
 
 // Get all assets in the database, along with all the data from all the asset tables, and return them
-module.exports.getFullAssets = () => {
+module.exports.getFullAssets = (username) => {
     // Select All from the Assets table (check database diagram) and join it using the asset id with each of the tables
-    return dbConnection.query(
-        `SELECT * FROM ${dbSchema.ASSET_TABLE}\n` +
-        `INNER JOIN ${dbSchema.ASSET_LOCATION_TABLE} ON ${dbSchema.ASSET_TABLE}.asset_id = ${dbSchema.ASSET_LOCATION_TABLE}.asset_id\n` +
-        `INNER JOIN ${dbSchema.SITES_TABLE} ON ${dbSchema.ASSET_LOCATION_TABLE}.site_id = ${dbSchema.SITES_TABLE}.site_id\n` +
-        `INNER JOIN ${dbSchema.LOCATIONS_TABLE} ON ${dbSchema.ASSET_LOCATION_TABLE}.location_id = ${dbSchema.LOCATIONS_TABLE}.location_id\n` +
-        `INNER JOIN ${dbSchema.ASSET_TYPE_TABLE} ON ${dbSchema.ASSET_TABLE}.asset_id = ${dbSchema.ASSET_TYPE_TABLE}.asset_id\n` +
-        `INNER JOIN ${dbSchema.CATEGORIES_TABLE} ON ${dbSchema.ASSET_TYPE_TABLE}.category_id = ${dbSchema.CATEGORIES_TABLE}.category_id\n` +
-        `INNER JOIN ${dbSchema.ASSET_PURCHASE_TABLE} ON ${dbSchema.ASSET_TABLE}.asset_id = ${dbSchema.ASSET_PURCHASE_TABLE}.asset_id\n` +
-        `INNER JOIN ${dbSchema.ASSET_MAINTENANCE_TABLE} ON ${dbSchema.ASSET_TABLE}.asset_id = ${dbSchema.ASSET_MAINTENANCE_TABLE}.asset_id;`
-    )
+    const queryStr = `SELECT * FROM ${dbSchema.ASSET_TABLE}\n` +
+    `INNER JOIN ${dbSchema.ASSET_LOCATION_TABLE} ON ${dbSchema.ASSET_TABLE}.asset_id = ${dbSchema.ASSET_LOCATION_TABLE}.asset_id\n` +
+    `INNER JOIN ${dbSchema.SITES_TABLE} ON ${dbSchema.ASSET_LOCATION_TABLE}.site_id = ${dbSchema.SITES_TABLE}.site_id\n` +
+    `INNER JOIN ${dbSchema.LOCATIONS_TABLE} ON ${dbSchema.ASSET_LOCATION_TABLE}.location_id = ${dbSchema.LOCATIONS_TABLE}.location_id\n` +
+    `INNER JOIN ${dbSchema.ASSET_TYPE_TABLE} ON ${dbSchema.ASSET_TABLE}.asset_id = ${dbSchema.ASSET_TYPE_TABLE}.asset_id\n` +
+    `INNER JOIN ${dbSchema.CATEGORIES_TABLE} ON ${dbSchema.ASSET_TYPE_TABLE}.category_id = ${dbSchema.CATEGORIES_TABLE}.category_id\n` +
+    `INNER JOIN ${dbSchema.ASSET_PURCHASE_TABLE} ON ${dbSchema.ASSET_TABLE}.asset_id = ${dbSchema.ASSET_PURCHASE_TABLE}.asset_id\n` +
+    `INNER JOIN ${dbSchema.ASSET_MAINTENANCE_TABLE} ON ${dbSchema.ASSET_TABLE}.asset_id = ${dbSchema.ASSET_MAINTENANCE_TABLE}.asset_id\n` +
+    `WHERE ${dbSchema.ASSET_TABLE}.username = '${username}';`;
+
+    return dbConnection.query(queryStr)
         .then((result) => {
             logger.log(`Fetched full asset data from database:`, result);
             return Promise.resolve(result);
         })
-        .catch((err) => Promise.reject(new DbOperationError(`Failed to select all assets\n\n:${err.stack}`)));
+        .catch((err) => Promise.reject(new DbOperationError(`Failed to select full assets\n\n:${err.stack}`)));
 };
 
 // Get the location data of a given asset
