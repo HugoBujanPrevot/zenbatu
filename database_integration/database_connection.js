@@ -26,6 +26,16 @@ module.exports.createConnection = (hostIp, user, password) => {
     });
 };
 
+/**
+ * Get the state of the database connection.
+ */
+module.exports.getState = () => {
+    if (dbConnection == null || dbConnection.state == null)
+        return "disconnected";
+
+    return dbConnection.state;
+};
+
 /** Attempt to connect to the database and resolve the
  * promise if successful; otherwise reject it with an error
  */
