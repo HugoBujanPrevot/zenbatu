@@ -12,9 +12,9 @@ const DAYS_IN_YEAR = 365;
 // and generate a report on whether their maintenance is due, as well
 // as their current value given their useful lifespan and whether
 // the asset has exceeded its useful life
-module.exports.generateReport = async function () {
+module.exports.generateReport = async function (username) {
     try {
-        const assets = await dbOperations.getFullAssets();
+        const assets = await dbOperations.getFullAssets(username);
         const report = [];
 
         assets.forEach((asset) => {
