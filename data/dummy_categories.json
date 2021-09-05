@@ -1,14 +1,18 @@
 [
     {
-        "category_name": "Laptop"
+        "category_name": "Laptop",
+        "username": "test_user"
     },
     {
-        "category_name": "Desktop PC"
+        "category_name": "Desktop PC",
+        "username": "test_user"
     },
     {
-        "category_name": "Personal Vehicle"
+        "category_name": "Personal Vehicle",
+        "username": "test_user"
     },
     {
-        "category_name": "Machinery"
+        "category_name": "Machinery",
+        "username": "test_user"
     }
 ]

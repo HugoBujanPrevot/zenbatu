@@ -5,13 +5,15 @@
             "1st Floor",
             "2nd Floor",
             "Basement"
-        ]
+        ],
+        "username": "test_user"
     },
     {
         "site_name": "Manhattan",
         "locations": [
             "Newton Building",
             "Galileo Building"
-        ]
+        ],
+        "username": "test_user"
     }
 ]

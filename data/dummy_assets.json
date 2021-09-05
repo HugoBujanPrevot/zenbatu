@@ -13,7 +13,8 @@
         "vendor": "Amazon",
         "useful_life": 5,
         "last_maintenance_date": "2021-04-08",
-        "maintenance_schedule": "monthly"
+        "maintenance_schedule": "monthly",
+        "username": "test_user"
     },
     {
         "asset_id": "d9afe524-ab40-4166-943c-ef2e615751b9",
@@ -29,7 +30,8 @@
         "vendor": "Amazon",
         "useful_life": 5,
         "last_maintenance_date": "2021-06-08",
-        "maintenance_schedule": "quarterly"
+        "maintenance_schedule": "quarterly",
+        "username": "test_user"
     },
     {
         "asset_id": "98874cdc-c765-438f-979f-b4a7e0c04a32",
@@ -45,7 +47,8 @@
         "vendor": "Amazon",
         "useful_life": 5,
         "last_maintenance_date": "2021-01-13",
-        "maintenance_schedule": "quarterly"
+        "maintenance_schedule": "quarterly",
+        "username": "test_user"
     },
     {
         "asset_id": "b13b1dd7-56fb-4e42-a017-37f062ad3e0a",
@@ -61,7 +64,8 @@
         "vendor": "AutoTrader",
         "useful_life": 10,
         "last_maintenance_date": "2021-08-08",
-        "maintenance_schedule": "biweekly"
+        "maintenance_schedule": "biweekly",
+        "username": "test_user"
     },
     {
         "asset_id": "43fdf812-fffd-4c83-bddf-02e6285baa62",
@@ -77,6 +81,7 @@
         "vendor": "AutoTrader",
         "useful_life": 10,
         "last_maintenance_date": "2021-08-08",
-        "maintenance_schedule": "weekly"
+        "maintenance_schedule": "weekly",
+        "username": "test_user"
     }
 ]
