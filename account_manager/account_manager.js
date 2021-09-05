@@ -54,9 +54,14 @@ module.exports.logOut = async (username, password) =>
     ACTIVE_SESSIONS.splice(ACTIVE_SESSIONS.indexOf(username), 1);
 };
 
-module.exports.checkIfLoggedIn = async (username) =>
+module.exports.checkIfLoggedIn = async (username, password) =>
 {
     await exports.checkCredentials(username, password);
+    return ACTIVE_SESSIONS.includes(username);
+};
+
+module.exports.isLoggedIn = async (username) =>
+{
     return ACTIVE_SESSIONS.includes(username);
 };
 
