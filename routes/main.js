@@ -106,4 +106,22 @@ module.exports.initRoutes = function (expressApp) {
             .then((result) => response.send({ success: true }))
             .catch((err) => response.send({ success: false, err: err.message }));
     });
+
+    expressApp.post("/report", async (request, response) => {
+        const params = request.body;
+
+        try {
+            const isLoggedIn = accountManager.checkIfLoggedIn(params.username, params.password);
+
+            if (isLoggedIn === true)
+            {
+                const report = reporter.generateReport(params.username);
+                response.send({ success: true, data: report });
+            }
+
+            else response.send({ success: false, err: "You are not logged in!" });
+        } catch(err) {
+            response.send({ success: false, err: err.message });
+        }
+    });
 }
