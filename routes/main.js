@@ -63,7 +63,7 @@ module.exports.initRoutes = function (expressApp) {
             .catch((err) =>
             {
                 logger.log(`Error occurred:`, err);
-                response.render("user_dashboard.ejs", { err: err.message });
+                response.render("user_dashboard.ejs", { success: false, err: err.message });
             });
     });
 
