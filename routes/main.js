@@ -37,7 +37,7 @@ module.exports.initRoutes = function (expressApp) {
             .catch((err) => response.send({ success: false, err: err.message }));
     });
 
-    expressApp.post("/connect", (request, response) => {
+    expressApp.post("/login", (request, response) => {
         const params = request.body;
         const data = {};
 
