@@ -16,12 +16,10 @@ const dbInitializer = require("./database_initializer");
 const { DbOperationError } = require("../errors/custom_errors");
 
 
-module.exports.createConnection = (hostIp, username, password) => {
-    dbConnection.createConnection("2600:1700:9e00:6cf0:a887:baf7:3cc8:95b8", "test_user", "test");
-    logger.log(`Created database connection @ ${hostIp}`);
-};
+module.exports.connect = (hostIp, username, password) => {
+    dbConnection.createConnection(hostIp, username, password);
+    logger.log(`Created database connection object @ ${hostIp}`);
 
-module.exports.connect = () => {
     return dbConnection.connect()
         .then(() => {
             logger.log(`Connected to database successfully`);
