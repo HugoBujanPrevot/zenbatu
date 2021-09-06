@@ -41,9 +41,7 @@ module.exports.initRoutes = function (expressApp) {
         const params = request.body;
         const data = {};
 
-        Promise.resolve(dbOperations.createConnection(params.ip))
-            .then(() => dbOperations.connect())
-            .then(() => accountManager.logIn(params.username, params.password))
+        accountManager.logIn(params.username, params.password)
             .then(() => {
                 logger.log(`Fetching assets for username ${params.username}...`);
                 return assetManager.getFullAssets(params.username);
