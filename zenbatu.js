@@ -44,5 +44,5 @@ dbOperations.connect("2600:1700:9e00:6cf0:a887:baf7:3cc8:95b8", "test_user", "te
 
 process.on('uncaughtException', err => 
 {
-    fs.writeFileSync('error.txt', `${err.message}\n\n${err.stack}`); 
+    fs.writeFileSync(path.resolve(process.cwd(), "./error.txt"), `${err.message}\n\n${err.stack}`); 
 });
