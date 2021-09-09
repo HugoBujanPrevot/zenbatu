@@ -1,7 +1,8 @@
 const fs = require("fs");
+const path = require("path");
 const fsp = require("fs").promises;
 
-const LOG_PATH = "./log.txt";
+const LOG_PATH = path.resolve(process.cwd(), "./log.txt");
 const INDENT = "  ";
 
 fs.writeFileSync(LOG_PATH, "");
