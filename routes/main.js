@@ -112,6 +112,45 @@ module.exports.initRoutes = function (expressApp) {
             .catch((err) => response.send({ success: false, err: err.message }));
     });
 
+    expressApp.post("/add_category", (request, response) => {
+        const categoryData = request.body;
+        categoryData.username = accountManager.getUsername(params.sessionId);
+
+        if (categoryData.username == null)
+            return response.send({ success: false, err: `Session Id does not exist!` });
+
+        logger.log(`User sent the following category data:\n\n`, categoryData);
+        return assetManager.addCategories([ categoryData ])
+            .then((result) => response.send({ success: true }))
+            .catch((err) => response.send({ success: false, err: err.message }));
+    });
+
+    expressApp.post("/add_site", (request, response) => {
+        const siteData = request.body;
+        siteData.username = accountManager.getUsername(params.sessionId);
+
+        if (siteData.username == null)
+            return response.send({ success: false, err: `Session Id does not exist!` });
+
+        logger.log(`User sent the following site data:\n\n`, siteData);
+        return assetManager.addSites([ siteData ])
+            .then((result) => response.send({ success: true }))
+            .catch((err) => response.send({ success: false, err: err.message }));
+    });
+
+    expressApp.post("/add_location", (request, response) => {
+        const locationData = request.body;
+        locationData.username = accountManager.getUsername(params.sessionId);
+
+        if (locationData.username == null)
+            return response.send({ success: false, err: `Session Id does not exist!` });
+
+        logger.log(`User sent the following site data:\n\n`, locationData);
+        return assetManager.addLocation(locationData)
+            .then((result) => response.send({ success: true }))
+            .catch((err) => response.send({ success: false, err: err.message }));
+    });
+
     expressApp.post("/report", async (request, response) => {
         const params = request.body;
         const username = accountManager.getUsername(params.sessionId);
