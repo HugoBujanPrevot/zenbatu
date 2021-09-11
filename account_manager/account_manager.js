@@ -1,5 +1,6 @@
 const hasher = require("./hasher");
 const logger = require("../logger/logger");
+const idGenerator = require("../asset_manager/id_generator");
 const dbOperations = require("../database_integration/database_operations");
 const { LoginError } = require("../errors/custom_errors");
 
@@ -20,8 +21,9 @@ module.exports.logIn = async (username, password) => {
 
     try {
         await exports.checkCredentials(username, password);
-        ACTIVE_SESSIONS.push(username);
-        return Promise.resolve();
+        const sessionId = idGenerator.generateId();
+        ACTIVE_SESSIONS.push({ username, sessionId });
+        return Promise.resolve(sessionId);
     } catch (err) {
         logger.log(`Error occurred while logging in:`, err);
         return Promise.reject(err);
@@ -48,21 +50,46 @@ module.exports.checkCredentials = async (username, password) => {
     }
 };
 
-module.exports.logOut = async (username, password) =>
+module.exports.getSession = (sessionId) =>
 {
-    await exports.checkCredentials(username, password);
-    ACTIVE_SESSIONS.splice(ACTIVE_SESSIONS.indexOf(username), 1);
+    const loggedSession = ACTIVE_SESSIONS.find((session) => session.sessionId === sessionId);
+
+    if (loggedSession == null)
+        return null;
+
+    return loggedSession;
 };
 
-module.exports.checkIfLoggedIn = async (username, password) =>
+module.exports.getUsername = (sessionId) =>
 {
-    await exports.checkCredentials(username, password);
-    return ACTIVE_SESSIONS.includes(username);
+    const loggedSession = exports.getSession(sessionId);
+
+    if (loggedSession == null || loggedSession.username == null)
+        return null;
+
+    return loggedSession.username;
 };
 
-module.exports.isLoggedIn = async (username) =>
+module.exports.logOut = (sessionId) =>
 {
-    return ACTIVE_SESSIONS.includes(username);
+    if (exports.isSessionActive(sessionId) === false)
+        return;
+
+    ACTIVE_SESSIONS.forEach((session, i) =>
+    {
+        if (session[i].sessionId === sessionId)
+            ACTIVE_SESSIONS.splice(i, 1);
+    })
+};
+
+module.exports.isSessionActive = (sessionId) =>
+{
+    return exports.getSession(sessionId) != null;
+};
+
+module.exports.isUsernameLoggedIn = (username) =>
+{
+    return ACTIVE_SESSIONS.find((session) => session.username === username) != null;
 };
 
 module.exports.signUp = async (username, password) => {
