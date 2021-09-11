@@ -23,16 +23,14 @@ module.exports.initRoutes = function (expressApp) {
 
     expressApp.post("/loggedIn", (request, response) => {
         const params = request.body;
-
-        accountManager.checkIfLoggedIn(params.username, params.password)
-            .then((isLoggedIn) => response.send({ success: true, data: isLoggedIn }))
-            .catch((err) => response.send({ success: false, err: err.message }));
+        const isLoggedIn = accountManager.isSessionActive(params.sessionId);
+        response.send({ success: true, data: isLoggedIn });
     });
 
     expressApp.post("/logOut", (request, response) => {
         const params = request.body;
 
-        accountManager.logOut(params.username, params.password)
+        Promise.resolve(accountManager.logOut(params.sessionId))
             .then(() => response.redirect("/"))
             .catch((err) => response.send({ success: false, err: err.message }));
     });
@@ -42,8 +40,9 @@ module.exports.initRoutes = function (expressApp) {
         const data = {};
 
         accountManager.logIn(params.username, params.password)
-            .then(() => {
-                logger.log(`Fetching assets for username ${params.username}...`);
+            .then((id) => {
+                data.sessionId = id;
+                logger.log(`Fetching assets for session Id ${params.username}...`);
                 return assetManager.getFullAssets(params.username);
             })
             .then((assets) => {
@@ -86,11 +85,15 @@ module.exports.initRoutes = function (expressApp) {
     expressApp.post("/get_asset", (request, response) => {
         logger.log(`User requested the following asset:\n\n`, request.body);
         const params = request.body;
+        const username = accountManager.getUsername(params.sessionId);
+
+        if (username == null)
+            return response.send({ success: false, err: `Session Id does not exist!` });
 
         return assetManager.getAsset({
             name: params.name,
             id: params.id,
-            username: params.username
+            username
         })
             .then((result) => response.send({ success: true, data: result }))
             .catch((err) => response.send({ success: false, err: err.message }));
@@ -98,6 +101,10 @@ module.exports.initRoutes = function (expressApp) {
 
     expressApp.post("/add_asset", (request, response) => {
         const assetData = request.body;
+        assetData.username = accountManager.getUsername(params.sessionId);
+
+        if (assetData.username == null)
+            return response.send({ success: false, err: `Session Id does not exist!` });
 
         logger.log(`User sent the following asset data:\n\n`, assetData);
         return assetManager.addAsset(assetData)
@@ -107,17 +114,15 @@ module.exports.initRoutes = function (expressApp) {
 
     expressApp.post("/report", async (request, response) => {
         const params = request.body;
+        const username = accountManager.getUsername(params.sessionId);
+
+        if (username == null)
+            return response.send({ success: false, err: `Session Id does not exist!` });
 
         try {
-            const isLoggedIn = accountManager.checkIfLoggedIn(params.username, params.password);
+            const report = reporter.generateReport(username);
+            response.send({ success: true, data: report });
 
-            if (isLoggedIn === true)
-            {
-                const report = reporter.generateReport(params.username);
-                response.send({ success: true, data: report });
-            }
-
-            else response.send({ success: false, err: "You are not logged in!" });
         } catch(err) {
             response.send({ success: false, err: err.message });
         }
