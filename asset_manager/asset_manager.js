@@ -58,6 +58,12 @@ module.exports.addSites = (arrOfSiteObjects) => {
 };
 
 // Add a location to an existing site
-module.exports.addLocation = (siteId, locationName) => {
-    return dbOperations.addLocation(siteId, locationName);
+module.exports.addLocation = (locationData) => {
+    if (locationData.site_id == null)
+        throw new Error(`Location data needs to contain a site_id.`);
+
+    if (locationData.location_name == null)
+        throw new Error(`Location data needs to contain a location_name.`);
+
+    return dbOperations.addLocation(locationData.site_id, locationData.location_name);
 };
