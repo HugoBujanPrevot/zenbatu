@@ -33,7 +33,7 @@ router.initRoutes(app);
 app.listen(port, () => logger.log(`App listening on port ${port}`));
 
 // Establish database connection
-dbOperations.connect("2600:1700:9e00:6cf0:a887:baf7:3cc8:95b8", "test_user", "test")
+dbOperations.connect("192.81.130.83", "test_user", "zenb@tu")
 .then(() => 
 {
     logger.log(`App connected successfully, launching browser @ ${URL}...`);
