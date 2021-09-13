@@ -13,21 +13,21 @@ module.exports.initRoutes = function (expressApp) {
         response.render("index.ejs");
     });
 
-    expressApp.get("/database", (request, response) => {
-        response.render("database.ejs");
+    expressApp.get("/account_page", (request, response) => {
+        response.render("account_page.ejs");
     });
 
-    expressApp.get("/connectionState", (request, response) => {
+    expressApp.get("/connection_state", (request, response) => {
         response.send(dbOperations.getConnectionState());
     });
 
-    expressApp.post("/loggedIn", (request, response) => {
+    expressApp.post("/logged_in", (request, response) => {
         const params = request.body;
         const isLoggedIn = accountManager.isSessionActive(params.sessionId);
         response.send({ success: true, data: isLoggedIn });
     });
 
-    expressApp.post("/logOut", (request, response) => {
+    expressApp.post("/log_out", (request, response) => {
         const params = request.body;
 
         Promise.resolve(accountManager.logOut(params.sessionId))
@@ -74,14 +74,6 @@ module.exports.initRoutes = function (expressApp) {
             .catch((err) => response.send({ success: false, err: err.message } ));
     });
 
-    expressApp.get("/add_asset_page", (request, response) => {
-        response.render("add_asset_page.ejs");
-    });
-
-    expressApp.get("/get_asset_page", (request, response) => {
-        response.render("get_asset_page.ejs");
-    });
-
     expressApp.post("/get_asset", (request, response) => {
         logger.log(`User requested the following asset:\n\n`, request.body);
         const params = request.body;
@@ -101,7 +93,7 @@ module.exports.initRoutes = function (expressApp) {
 
     expressApp.post("/add_asset", (request, response) => {
         const assetData = request.body;
-        assetData.username = accountManager.getUsername(params.sessionId);
+        assetData.username = accountManager.getUsername(assetData.sessionId);
 
         if (assetData.username == null)
             return response.send({ success: false, err: `Session Id does not exist!` });
@@ -114,7 +106,7 @@ module.exports.initRoutes = function (expressApp) {
 
     expressApp.post("/add_category", (request, response) => {
         const categoryData = request.body;
-        categoryData.username = accountManager.getUsername(params.sessionId);
+        categoryData.username = accountManager.getUsername(categoryData.sessionId);
 
         if (categoryData.username == null)
             return response.send({ success: false, err: `Session Id does not exist!` });
@@ -127,25 +119,31 @@ module.exports.initRoutes = function (expressApp) {
 
     expressApp.post("/add_site", (request, response) => {
         const siteData = request.body;
-        siteData.username = accountManager.getUsername(params.sessionId);
-
-        if (siteData.username == null)
-            return response.send({ success: false, err: `Session Id does not exist!` });
+        const siteObj = { 
+            site_name: siteData.site_name, 
+            locations: [ siteData.location_name ] 
+        };
 
         logger.log(`User sent the following site data:\n\n`, siteData);
-        return assetManager.addSites([ siteData ])
+
+        siteObj.username = accountManager.getUsername(siteData.sessionId);
+
+        if (siteObj.username == null)
+            return response.send({ success: false, err: `Session Id does not exist!` });
+
+        return assetManager.addSites([ siteObj ])
             .then((result) => response.send({ success: true }))
             .catch((err) => response.send({ success: false, err: err.message }));
     });
 
     expressApp.post("/add_location", (request, response) => {
         const locationData = request.body;
-        locationData.username = accountManager.getUsername(params.sessionId);
+        logger.log(`User sent the following site data:\n\n`, locationData);
+        locationData.username = accountManager.getUsername(locationData.sessionId);
 
         if (locationData.username == null)
             return response.send({ success: false, err: `Session Id does not exist!` });
 
-        logger.log(`User sent the following site data:\n\n`, locationData);
         return assetManager.addLocation(locationData)
             .then((result) => response.send({ success: true }))
             .catch((err) => response.send({ success: false, err: err.message }));
