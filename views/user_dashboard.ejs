@@ -18,6 +18,8 @@
 
                     <form id="addAssetForm" action="/add_asset" method="POST">
 
+                        <input type="hidden" name="sessionId" value="<%=(typeof sessionId === "string") ? sessionId : "none"%>"/>
+
                         <div class="row">
                             <div class="col-3">
                                 <input class="form-control" id="assetNameInput" name="asset_name" type="text" placeholder="Name" required>
@@ -62,7 +64,7 @@
                                 </select>
                             </div>
                             <div class="col-3">
-                                <select class="form-control" id="assetCategoryInput" name="category" required>
+                                <select class="form-control" id="assetCategoryInput" name="category_name" required>
 
                                     <% if (typeof categories === "object" && Array.isArray(categories) === true) { %>
 
@@ -97,13 +99,14 @@
 
             <div class="card" style="margin-top: 20px">
                 <div class="card-header">
-                    <h4>Add Category</h4>
+                    <h4>Add Asset Category</h4>
                 </div>
 
                 <div class="card-body">
-                    <form class="form-inline" id="addAssetForm" action="/add_category" method="POST">
+                    <form class="form-inline" id="addCategoryForm" action="/add_category" method="POST">
+                        <input type="hidden" name="sessionId" value="<%=(typeof sessionId === "string") ? sessionId : "none"%>"/>
                         <div class="input-group mb-3">
-                            <input class="form-control" id="assetNameInput" name="name" type="text" placeholder="Asset Name">
+                            <input class="form-control" id="categoryNameInput" name="category_name" type="text" placeholder="Category Name">
                             <div class="input-group-append">
                                 <input class="btn btn-primary" type="submit" value="Add" >
                             </div>
@@ -119,9 +122,44 @@
                 </div>
 
                 <div class="card-body">
-                    <form class="form-inline" id="addAssetForm" action="/add_site" method="POST">
+                    <form class="form-inline" id="addSiteForm" action="/add_site" method="POST">
+                        <input type="hidden" name="sessionId" value="<%=(typeof sessionId === "string") ? sessionId : "none"%>"/>
                         <div class="input-group mb-3">
-                            <input class="form-control" id="assetNameInput" name="name" type="text" placeholder="Asset Name">
+                            <input class="form-control" id="siteNameInput" name="site_name" type="text" placeholder="Site Name">
+                            <input class="form-control" id="basicLocationNameInput" name="location_name" type="text" placeholder="Site Location Name">
+                            <div class="input-group-append">
+                                <input class="btn btn-primary" type="submit" value="Add" >
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+
+            <div class="card" style="margin-top: 20px; margin-bottom: 20px">
+                <div class="card-header">
+                    <h4>Add Location to Site</h4>
+                </div>
+
+                <div class="card-body">
+                    <form class="form-inline" id="addLocationForm" action="/add_location" method="POST">
+                        <input type="hidden" name="sessionId" value="<%=(typeof sessionId === "string") ? sessionId : "none"%>"/>
+                        <div class="input-group mb-3">
+                            
+                            <select class="form-control" id="addLocationSiteInput" name="site_id" required>
+
+                                <% if (typeof sites === "object" && Array.isArray(sites) === true) { %>
+                                <% var addedSites = []; %>
+                                <% sites.forEach((site) => { %>
+                                <% if (sites.includes(site.site_name) === false) { %>
+                                    <% sites.push(site.site_name); %>
+                                    <option value=<%=site.site_id %>><%=site.site_name %></option>
+                                <% }}); %>
+
+                                <% } %>
+                            </select>
+
+                            <input class="form-control" id="locationNameInput" name="location_name" type="text" placeholder="New Location Name">
                             <div class="input-group-append">
                                 <input class="btn btn-primary" type="submit" value="Add" >
                             </div>
