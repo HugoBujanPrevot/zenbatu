@@ -42,19 +42,11 @@ module.exports.initRoutes = function (expressApp) {
         accountManager.logIn(params.username, params.password)
             .then((id) => {
                 data.sessionId = id;
-                logger.log(`Fetching assets for session Id ${params.username}...`);
-                return assetManager.getFullAssets(params.username);
+                logger.log(`Fetching data for username ${params.username}...`);
+                return _getUserData(params.username);
             })
-            .then((assets) => {
-                data.assets = assets;
-                return dbOperations.getAllCategories(params.username);
-            })
-            .then((categories) => {
-                data.categories = categories;
-                return dbOperations.getAllSites(params.username);
-            })
-            .then((sites) => {
-                data.sites = sites;
+            .then((userData) => {
+                Object.assign(data, userData);
                 return response.render("user_dashboard.ejs", data);
             })
             .catch((err) =>
@@ -100,7 +92,7 @@ module.exports.initRoutes = function (expressApp) {
 
         logger.log(`User sent the following asset data:\n\n`, assetData);
         return assetManager.addAsset(assetData)
-            .then((result) => response.send({ success: true }))
+            .then((data) => response.send({ success: true, data }))
             .catch((err) => response.send({ success: false, err: err.message }));
     });
 
@@ -112,8 +104,8 @@ module.exports.initRoutes = function (expressApp) {
             return response.send({ success: false, err: `Session Id does not exist!` });
 
         logger.log(`User sent the following category data:\n\n`, categoryData);
-        return assetManager.addCategories([ categoryData ])
-            .then((result) => response.send({ success: true }))
+        return assetManager.addCategory(categoryData)
+            .then((data) => response.json({ success: true, data }))
             .catch((err) => response.send({ success: false, err: err.message }));
     });
 
@@ -131,8 +123,8 @@ module.exports.initRoutes = function (expressApp) {
         if (siteObj.username == null)
             return response.send({ success: false, err: `Session Id does not exist!` });
 
-        return assetManager.addSites([ siteObj ])
-            .then((result) => response.send({ success: true }))
+        return assetManager.addSite(siteObj)
+            .then((data) => response.send({ success: true, data }))
             .catch((err) => response.send({ success: false, err: err.message }));
     });
 
@@ -145,7 +137,7 @@ module.exports.initRoutes = function (expressApp) {
             return response.send({ success: false, err: `Session Id does not exist!` });
 
         return assetManager.addLocation(locationData)
-            .then((result) => response.send({ success: true }))
+            .then((data) => response.send({ success: true, data }))
             .catch((err) => response.send({ success: false, err: err.message }));
     });
 
@@ -164,4 +156,13 @@ module.exports.initRoutes = function (expressApp) {
             response.send({ success: false, err: err.message });
         }
     });
+}
+
+async function _getUserData(username)
+{
+    const data = {};
+    data.assets = await assetManager.getFullAssets(username);
+    data.categories = await assetManager.getAllCategories(username);
+    data.sites = await assetManager.getAllSites(username);
+    return data;
 }
