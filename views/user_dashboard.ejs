@@ -64,19 +64,19 @@
                                 </select>
                             </div>
                             <div class="col-3">
-                                <select class="form-control" id="assetCategoryInput" name="category_name" required>
+                                <select class="form-control" id="assetCategoryInput" name="category_id" required>
 
                                     <% if (typeof categories === "object" && Array.isArray(categories) === true) { %>
 
                                     <% categories.forEach((category) => { %>
-                                    <option value=<%=category.category_name %>><%=category.category_name %></option>
+                                    <option value=<%=category.category_id %>><%=category.category_name %></option>
                                     <% }); %>
 
                                     <% } %>
                                 </select>
                             </div>     
                             <div class="col-3">
-                                <select class="form-control" id="assetSiteInput" name="site" required>
+                                <select class="form-control" id="assetSiteInput" name="location_id" required>
 
                                     <% if (typeof sites === "object" && Array.isArray(sites) === true) { %>
 
