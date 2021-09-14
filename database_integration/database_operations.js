@@ -196,13 +196,13 @@ module.exports.getAccount = (username) => {
         .catch((err) => Promise.reject(new DbOperationError(`Failed to get account\n\n:${err.stack}`)));
 };
 
-module.exports.getCategory = (id, username) => {
-    return dbConnection.query(`SELECT * FROM ${dbSchema.CATEGORIES_TABLE} WHERE category_id = '${id}' AND username = '${username}';`)
+module.exports.getCategory = (category_name, username) => {
+    return dbConnection.query(`SELECT * FROM ${dbSchema.CATEGORIES_TABLE} WHERE category_name = '${category_name}' AND username = '${username}';`)
         .then((result) => {
-            logger.log(`Fetched category with id ${id} from database`);
+            logger.log(`Fetched category with name ${category_name} from database`);
             return Promise.resolve(result[0]);
         })
-        .catch((err) => Promise.reject(new DbOperationError(`Failed to get category with id ${id}\n\n:${err.stack}`)));
+        .catch((err) => Promise.reject(new DbOperationError(`Failed to get category with name ${category_name}\n\n:${err.stack}`)));
 };
 
 module.exports.getAllCategories = (username) => {
@@ -214,16 +214,17 @@ module.exports.getAllCategories = (username) => {
         .catch((err) => Promise.reject(new DbOperationError(`Failed to get all categories\n\n:${err.stack}`)));
 };
 
-module.exports.getSite = (id, username) => {
+module.exports.getSite = (siteNameOrId, username) => {
     return dbConnection.query(
-        `SELECT * FROM ${dbSchema.SITES_TABLE} WHERE site_id = '${id}' AND username = '${username}'\n` +
-        `INNER JOIN ${dbSchema.LOCATIONS_TABLE} ON ${dbSchema.SITES_TABLE}.site_id = ${dbSchema.LOCATIONS_TABLE}.site_id;`
+        `SELECT * FROM ${dbSchema.SITES_TABLE}\n` +
+        `INNER JOIN ${dbSchema.LOCATIONS_TABLE} ON ${dbSchema.SITES_TABLE}.site_id = ${dbSchema.LOCATIONS_TABLE}.site_id\n` +
+        `WHERE (${dbSchema.SITES_TABLE}.site_name = '${siteNameOrId}' OR ${dbSchema.SITES_TABLE}.site_id = '${siteNameOrId}') AND ${dbSchema.SITES_TABLE}.username = '${username}'`
     )
         .then((result) => {
-            logger.log(`Fetched site with id ${id} from database`);
+            logger.log(`Fetched site with identifier ${siteNameOrId} from database`);
             return Promise.resolve(result[0]);
         })
-        .catch((err) => Promise.reject(new DbOperationError(`Failed to get site with id ${id}\n\n:${err.stack}`)));
+        .catch((err) => Promise.reject(new DbOperationError(`Failed to get site with identifier ${siteNameOrId}\n\n:${err.stack}`)));
 };
 
 module.exports.getAllSites = (username) => {
@@ -242,7 +243,17 @@ module.exports.getAllSites = (username) => {
 // Get all assets in the database and return them
 module.exports.getAsset = (assetNameOrId, username) => {
     // Select an asset from the Assets table (check database diagram) and return the result
-    return dbConnection.query(`SELECT * FROM ${dbSchema.ASSET_TABLE} WHERE (asset_name = '${assetNameOrId}' OR asset_id = '${assetNameOrId}') AND username = '${username}'`)
+    const queryStr = `SELECT * FROM ${dbSchema.ASSET_TABLE}\n` +
+    `INNER JOIN ${dbSchema.ASSET_LOCATION_TABLE} ON ${dbSchema.ASSET_TABLE}.asset_id = ${dbSchema.ASSET_LOCATION_TABLE}.asset_id\n` +
+    `INNER JOIN ${dbSchema.SITES_TABLE} ON ${dbSchema.ASSET_LOCATION_TABLE}.site_id = ${dbSchema.SITES_TABLE}.site_id\n` +
+    `INNER JOIN ${dbSchema.LOCATIONS_TABLE} ON ${dbSchema.ASSET_LOCATION_TABLE}.location_id = ${dbSchema.LOCATIONS_TABLE}.location_id\n` +
+    `INNER JOIN ${dbSchema.ASSET_TYPE_TABLE} ON ${dbSchema.ASSET_TABLE}.asset_id = ${dbSchema.ASSET_TYPE_TABLE}.asset_id\n` +
+    `INNER JOIN ${dbSchema.CATEGORIES_TABLE} ON ${dbSchema.ASSET_TYPE_TABLE}.category_id = ${dbSchema.CATEGORIES_TABLE}.category_id\n` +
+    `INNER JOIN ${dbSchema.ASSET_PURCHASE_TABLE} ON ${dbSchema.ASSET_TABLE}.asset_id = ${dbSchema.ASSET_PURCHASE_TABLE}.asset_id\n` +
+    `INNER JOIN ${dbSchema.ASSET_MAINTENANCE_TABLE} ON ${dbSchema.ASSET_TABLE}.asset_id = ${dbSchema.ASSET_MAINTENANCE_TABLE}.asset_id\n` +
+    `WHERE (${dbSchema.ASSET_TABLE}.asset_name = '${assetNameOrId}' OR ${dbSchema.ASSET_TABLE}.asset_id = '${assetNameOrId}') AND ${dbSchema.ASSET_TABLE}.username = '${username}';`;
+
+    return dbConnection.query(queryStr)
         .then((result) => {
             logger.log(`Fetched asset with identifier ${assetNameOrId} from database:`, result);
             return Promise.resolve(result);
