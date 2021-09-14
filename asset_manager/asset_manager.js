@@ -4,7 +4,12 @@ const dbOperations = require("../database_integration/database_operations");
 
 
 module.exports.addAsset = (assetData) => {
-    return exports.addAssets([ assetData ]);
+    return exports.addAssets([ assetData ])
+    .then((result) => exports.getAsset({ 
+        id: null,
+        name: assetData.asset_name, 
+        username: assetData.username
+    }));
 };
 
 module.exports.addAssets = (assets) => {
@@ -21,20 +26,9 @@ module.exports.addAssets = (assets) => {
         });
 };
 
-module.exports.getAsset = ({name, id, username}) => {
-    return dbOperations.getAsset((id != null) ? id : name, username)
-        .catch((err) => {
-            logger.log(`Error: ${err.message}`, err.stack);
-            return Promise.reject(new Error(`Error occurred when getting the asset from the database.`));
-        });
-};
-
-module.exports.getFullAssets = (username) => {
-    return dbOperations.getFullAssets(username)
-        .catch((err) => {
-            logger.log(`Error: ${err.message}`, err.stack);
-            return Promise.reject(new Error(`Error occurred when getting the full assets from the database.`));
-        });
+module.exports.addCategory = (categoryData) => {
+    return dbOperations.addCategories([ categoryData ])
+    .then((result) => exports.getCategory(categoryData.category_name, categoryData.username));
 };
 
 module.exports.addCategories = (arrOfCategoryObjects) => {
@@ -45,6 +39,15 @@ module.exports.addCategories = (arrOfCategoryObjects) => {
         throw new Error(`Array of categories is empty.`);
 
     return dbOperations.addCategories(arrOfCategoryObjects);
+};
+
+module.exports.addSite = (siteData) => {
+    return dbOperations.addSites([ siteData ])
+    .then((result) => exports.getSite({ 
+        id: null,
+        name: siteData.site_name, 
+        username: siteData.username
+    }));
 };
 
 module.exports.addSites = (arrOfSiteObjects) => {
@@ -65,5 +68,58 @@ module.exports.addLocation = (locationData) => {
     if (locationData.location_name == null)
         throw new Error(`Location data needs to contain a location_name.`);
 
-    return dbOperations.addLocation(locationData.site_id, locationData.location_name);
+    return dbOperations.addLocation(locationData.site_id, locationData.location_name)
+        .then((result) => exports.getSite({ 
+            id: locationData.site_id,
+            name: null, 
+            username: locationData.username
+        }));
+};
+
+module.exports.getAsset = ({name, id, username}) => {
+    return dbOperations.getAsset((id != null) ? id : name, username)
+        .catch((err) => {
+            logger.log(`Error: ${err.message}`, err.stack);
+            return Promise.reject(new Error(`Error occurred when getting the asset from the database.`));
+        });
+};
+
+module.exports.getFullAssets = (username) => {
+    return dbOperations.getFullAssets(username)
+        .catch((err) => {
+            logger.log(`Error: ${err.message}`, err.stack);
+            return Promise.reject(new Error(`Error occurred when getting the full assets from the database.`));
+        });
+};
+
+module.exports.getCategory = (name, username) => {
+    return dbOperations.getCategory(name, username)
+        .catch((err) => {
+            logger.log(`Error: ${err.message}`, err.stack);
+            return Promise.reject(new Error(`Error occurred when getting the category from the database.`));
+        });
+};
+
+module.exports.getAllCategories = (username) => {
+    return dbOperations.getAllCategories(username)
+        .catch((err) => {
+            logger.log(`Error: ${err.message}`, err.stack);
+            return Promise.reject(new Error(`Error occurred when getting all categories from the database.`));
+        });
+};
+
+module.exports.getSite = ({name, id, username}) => {
+    return dbOperations.getSite((id != null) ? id : name, username)
+        .catch((err) => {
+            logger.log(`Error: ${err.message}`, err.stack);
+            return Promise.reject(new Error(`Error occurred when getting the site from the database.`));
+        });
+};
+
+module.exports.getAllSites = (username) => {
+    return dbOperations.getAllSites(username)
+        .catch((err) => {
+            logger.log(`Error: ${err.message}`, err.stack);
+            return Promise.reject(new Error(`Error occurred when getting all sites from the database.`));
+        });
 };
