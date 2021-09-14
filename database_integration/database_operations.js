@@ -57,7 +57,7 @@ module.exports.addAssets = (arrOfAssetObjects) => {
             `INSERT INTO ${dbSchema.ASSET_LOCATION_TABLE} (asset_id, site_id, location_id) VALUES ('${assetObj.asset_id}', '${assetObj.site_id}', '${assetObj.location_id}');\n` +
             `INSERT INTO ${dbSchema.ASSET_TYPE_TABLE} (asset_id, brand, model, serial_no, category_id) VALUES ('${assetObj.asset_id}', '${assetObj.brand}', '${assetObj.model}', '${assetObj.serial_no}', '${assetObj.category_id}');\n` +
             `INSERT INTO ${dbSchema.ASSET_PURCHASE_TABLE} (asset_id, purchase_date, cost, vendor, useful_life) VALUES ('${assetObj.asset_id}', '${assetObj.purchase_date}', '${assetObj.cost}', '${assetObj.vendor}', '${assetObj.useful_life}');\n` +
-            `INSERT INTO ${dbSchema.ASSET_MAINTENANCE_TABLE} (asset_id, maintenance_schedule, last_maintenance_date) VALUES ('${assetObj.asset_id}', '${assetObj.maintenance_schedule}', '${assetObj.last_maintenance_date}');\n`
+            `INSERT INTO ${dbSchema.ASSET_MAINTENANCE_TABLE} (asset_id, maintenance_schedule) VALUES ('${assetObj.asset_id}', '${assetObj.maintenance_schedule}');\n`
     });
 
     return dbConnection.query(queryStr)
