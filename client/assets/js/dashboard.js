@@ -12,7 +12,9 @@ $(document).ready(() =>
     $("#addAssetForm").submit(function(event)
     {
         event.preventDefault();
-        const formData = $(this).serialize();
+        var formData = $(this).serialize();
+        const siteId = $("#assetSiteInput").find(":selected").data("site_id");
+        formData += `&site_id=${siteId}`
 
         console.log(formData);
 
@@ -150,14 +152,17 @@ function _addLocation(locationData)
 
 function _addAsset(assetData)
 {
+    if (Array.isArray(assetData) === true)
+        assetData = assetData[assetData.length - 1];
+
     console.log(assetData);
-    $("#tableBody").append(
-        `<td>${assetData.asset_id}</td>
-         <td>${assetData.asset_name}</td>
-         <td>${assetData.category_name}</td>
-         <td>${assetData.brand}</td>
-         <td>${assetData.model}</td>
-         <td>${assetData.site_name}</td>
-         <td>${assetData.location_name}</td>`
-    );
+    $("#assetTable").DataTable().row.add([
+        assetData.asset_id,
+        assetData.asset_name,
+        assetData.category_name,
+        assetData.brand,
+        assetData.model,
+        assetData.site_name,
+        assetData.location_name
+    ]).draw(false);
 }
