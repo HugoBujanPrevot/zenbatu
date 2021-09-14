@@ -28,7 +28,11 @@ module.exports.addAssets = (assets) => {
 
 module.exports.addCategory = (categoryData) => {
     return dbOperations.addCategories([ categoryData ])
-    .then((result) => exports.getCategory(categoryData.category_name, categoryData.username));
+    .then((result) => exports.getCategory({
+        id: categoryData.category_id,
+        name: categoryData.category_name, 
+        username: categoryData.username
+    }));
 };
 
 module.exports.addCategories = (arrOfCategoryObjects) => {
@@ -92,8 +96,8 @@ module.exports.getFullAssets = (username) => {
         });
 };
 
-module.exports.getCategory = (name, username) => {
-    return dbOperations.getCategory(name, username)
+module.exports.getCategory = ({name, id, username}) => {
+    return dbOperations.getCategory((id != null) ? id : name, username)
         .catch((err) => {
             logger.log(`Error: ${err.message}`, err.stack);
             return Promise.reject(new Error(`Error occurred when getting the category from the database.`));
