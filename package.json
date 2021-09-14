@@ -4,7 +4,7 @@
   "description": "Asset tracking app built for the Agile Software Development course from University of London Goldsmith's BSc in Computer Science.",
   "main": "index.js",
   "scripts": {
-    "start": "node zenbatu.js"
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
