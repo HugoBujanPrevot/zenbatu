@@ -7,4 +7,7 @@ package-lock.json
 *.zip
 
 #executables created by pkg
-zenbatu-*
+index-*
+
+#ignore test manager which is not ready
+test_manager/

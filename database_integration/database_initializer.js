@@ -1,17 +1,35 @@
+
+/**
+ * This module handles the initialization of the database. This includes
+ * programmatically creating the schema of the database if it does not exist,
+ * and adding the dummy data that is stored in the /data json files for
+ * testing purposes. The schema that is used in this database can be viewed
+ * online here: 
+ * https://drive.google.com/file/d/1ArjNedJwgyibFTIOdfshZzXBMGA3xhRd/view?usp=sharing
+ */
+
+// Required modules
 const logger = require("../logger/logger");
 const dbSchema = require("../data/db_schema.json");
 const dbOperations = require("./database_operations");
 const { DbOperationError } = require("../errors/custom_errors");
 const accountManager = require("../account_manager/account_manager");
 
+// Creates the database schema and adds the dummy data for testing
 module.exports.initializeDb = (dbConnection) => {
+    // Delete the previously existing database for testing purposes,
+    // so that each new initialization will have the most up to date schema
     return _deleteDatabase(dbConnection, dbSchema.DB_NAME)
+        // Create the database itself
         .then(() => _createDatabase(dbConnection, dbSchema.DB_NAME))
+        // Select the created database
         .then(() => _useDatabase(dbConnection, dbSchema.DB_NAME))
+        // Create the Accounts table with the right columns and constraints
         .then(() => _createTable(dbConnection, dbSchema.ACCOUNTS_TABLE, {
             username: "VARCHAR(36) NOT NULL PRIMARY KEY",
             password: "CHAR(60) NOT NULL"
         }))
+        // Create the Assets table with the right columns and constraints
         .then(() => _createTable(dbConnection, dbSchema.ASSET_TABLE, {
             asset_id: "CHAR(36) NOT NULL PRIMARY KEY",
             asset_name: "VARCHAR(50) NOT NULL",
@@ -21,6 +39,7 @@ module.exports.initializeDb = (dbConnection) => {
                 `FOREIGN KEY (username) REFERENCES ${dbSchema.ACCOUNTS_TABLE}(username) ON DELETE CASCADE`
             ]
         }))
+        // Create the Sites table with the right columns and constraints
         .then((result) => {
             return _createTable(dbConnection, dbSchema.SITES_TABLE, {
                 site_id: "INT AUTO_INCREMENT PRIMARY KEY",
@@ -31,6 +50,7 @@ module.exports.initializeDb = (dbConnection) => {
                 ]
             });
         })
+        // Create the Locations table with the right columns and constraints
         .then((result) => {
             return _createTable(dbConnection, dbSchema.LOCATIONS_TABLE, {
                 location_id: "INT AUTO_INCREMENT PRIMARY KEY",
@@ -41,6 +61,7 @@ module.exports.initializeDb = (dbConnection) => {
                 ]
             });
         })
+        // Create the Categories table with the right columns and constraints
         .then((result) => {
             return _createTable(dbConnection, dbSchema.CATEGORIES_TABLE, {
                 category_id: "INT AUTO_INCREMENT PRIMARY KEY",
@@ -51,6 +72,7 @@ module.exports.initializeDb = (dbConnection) => {
                 ]
             });
         })
+        // Create the AssetLocation table with the right columns and constraints
         .then((result) => {
             return _createTable(dbConnection, dbSchema.ASSET_LOCATION_TABLE, {
                 asset_id: `CHAR(36) NOT NULL PRIMARY KEY`,
@@ -64,6 +86,7 @@ module.exports.initializeDb = (dbConnection) => {
                 ]
             });
         })
+        // Create the AssetType table with the right columns and constraints
         .then((result) => {
             return _createTable(dbConnection, dbSchema.ASSET_TYPE_TABLE, {
                 asset_id: `CHAR(36) NOT NULL PRIMARY KEY`,
@@ -77,6 +100,7 @@ module.exports.initializeDb = (dbConnection) => {
                 ]
             });
         })
+        // Create the AssetPurchase table with the right columns and constraints
         .then((result) => {
             return _createTable(dbConnection, dbSchema.ASSET_PURCHASE_TABLE, {
                 asset_id: `CHAR(36) NOT NULL PRIMARY KEY`,
@@ -89,6 +113,7 @@ module.exports.initializeDb = (dbConnection) => {
                 ]
             })
         })
+        // Create the AssetMaintenance table with the right columns and constraints
         .then((result) => {
             return _createTable(dbConnection, dbSchema.ASSET_MAINTENANCE_TABLE, {
                 asset_id: `CHAR(36) NOT NULL PRIMARY KEY`,
@@ -99,6 +124,7 @@ module.exports.initializeDb = (dbConnection) => {
                 ]
             });
         })
+        // Insert the dummy data
         .then((result) => {
             return _insertDummyData();
         })
@@ -182,6 +208,7 @@ function _createTable(dbConnection, tableName, tableSchema) {
         else schemaStr += `\t${colKey} ${colValueType}`;
     }
 
+    // Create the table if it doesn't exist, using the above built query
     return dbConnection.query(`CREATE TABLE IF NOT EXISTS ${tableName} (\n${schemaStr}${foreignKeysStr}\n);`)
         .then((result) => {
             logger.log(`Created new table '${tableName}' with schema:`, tableSchema);
@@ -189,7 +216,9 @@ function _createTable(dbConnection, tableName, tableSchema) {
         });
 }
 
+// Insert all the different dummy data
 async function _insertDummyData() {
+    // Load in all the dummy data json files
     const assets = require("../data/dummy_assets.json");
     const categories = require("../data/dummy_categories.json");
     const sites = require("../data/dummy_sites.json");
@@ -197,6 +226,8 @@ async function _insertDummyData() {
 
     logger.log(`Adding dummy accounts...`);
 
+    // Iterate through all test accounts and add each of them by
+    // signing them up as a user would
     for (var i = 0; i < testAccounts.length; i++)
     {
         const account = testAccounts[i];
@@ -204,15 +235,19 @@ async function _insertDummyData() {
         logger.log(`Account '${account.username}' added!`);
     }
 
+    // Add the dummy sites
     return dbOperations.addSites(sites)
+        // Add the dummy categories next
         .then((result) => {
             logger.log(`Finished adding dummy sites`);
             return dbOperations.addCategories(categories);
         })
+        // Add the dummy assets next
         .then((result) => {
             logger.log(`Finished adding dummy categories`);
             return dbOperations.addAssets(assets);
         })
+        // Finish up
         .then((result) => {
             logger.log(`Finished adding dummy assets`);
             return Promise.resolve();

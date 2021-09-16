@@ -1,4 +1,12 @@
 
+/**
+ * This module is the entry point of the application. Here the
+ * Express is initialized and its server created to listen to
+ * incoming connections on the browser, to serve the website.
+ * The database connection also happens here.
+ */
+
+// Required modules
 const fs = require("fs");
 const express = require("express");
 const router = require("./routes/main");
@@ -8,6 +16,7 @@ const path = require("path");
 const process = require("process");
 const dbOperations = require("./database_integration/database_operations");
 
+// Create the Express app, and set the website URL on port 8089
 const app = express();
 const port = 8089;
 const URL = `http://localhost:${port}`;
@@ -41,7 +50,7 @@ dbOperations.connect("192.81.130.83", "test_user", "zenb@tu")
 })
 .catch((err) => logger.log(`Error connecting to database: ${err.message}\n\n${err.stack}`));
 
-
+// Catch program-wide exceptions that have not been caught and log them into an error file
 process.on('uncaughtException', err => 
 {
     fs.writeFileSync(path.resolve(process.cwd(), "./error.txt"), `${err.message}\n\n${err.stack}`); 

@@ -1,3 +1,4 @@
+
 /**
  * This module contains all the necessary database queries encapsulated into
  * their own functions for convenience. Queries are made in SQL (all the different
@@ -9,13 +10,15 @@
  * using regular callbacks.
  */
 
+// Required modules
 const logger = require("../logger/logger");
 const dbSchema = require("../data/db_schema.json");
 const dbConnection = require("./database_connection");
 const dbInitializer = require("./database_initializer");
 const { DbOperationError } = require("../errors/custom_errors");
 
-
+// Use the DB Connection module to create a connection, connect,
+// and then use the DB Initializer module to initialize our tables
 module.exports.connect = (hostIp, username, password) => {
     dbConnection.createConnection(hostIp, username, password);
     logger.log(`Created database connection object @ ${hostIp}`);
@@ -28,11 +31,12 @@ module.exports.connect = (hostIp, username, password) => {
         .then(() => logger.log(`Database initialized with dummy data`));
 };
 
+// Get the connection state through the DB Connection module
 module.exports.getConnectionState = () => {
     return dbConnection.getState();
 };
 
-
+// Add a user account to the Accounts table
 module.exports.addAccount = (username, password) => {
     return dbConnection.query(`INSERT INTO ${dbSchema.ACCOUNTS_TABLE} (username, password) VALUES ('${username}', '${password}');`)
         .then((result) => {
@@ -52,6 +56,9 @@ module.exports.addAsset = (assetObj) => {
 module.exports.addAssets = (arrOfAssetObjects) => {
     var queryStr = "";
 
+    // The query must be built in a single string of statements to ensure
+    // that it happens as a single operation, thus either adding it all
+    // or not adding any of it, to prevent errors
     arrOfAssetObjects.forEach((assetObj, i) => {
         queryStr += `\nINSERT INTO ${dbSchema.ASSET_TABLE} (asset_id, asset_name, username) VALUES ('${assetObj.asset_id}', '${assetObj.asset_name}', '${assetObj.username}');\n` +
             `INSERT INTO ${dbSchema.ASSET_LOCATION_TABLE} (asset_id, site_id, location_id) VALUES ('${assetObj.asset_id}', '${assetObj.site_id}', '${assetObj.location_id}');\n` +
@@ -60,6 +67,7 @@ module.exports.addAssets = (arrOfAssetObjects) => {
             `INSERT INTO ${dbSchema.ASSET_MAINTENANCE_TABLE} (asset_id, maintenance_schedule) VALUES ('${assetObj.asset_id}', '${assetObj.maintenance_schedule}');\n`
     });
 
+    // Make the query with the DB Connection module
     return dbConnection.query(queryStr)
         .then((result) => {
             logger.log(`Assets added to the database:`, arrOfAssetObjects);
@@ -72,11 +80,15 @@ module.exports.addAssets = (arrOfAssetObjects) => {
 module.exports.addCategories = (arrOfCategoryObjects) => {
     var queryStr = `INSERT INTO ${dbSchema.CATEGORIES_TABLE} (category_name, username) VALUES `;
 
+    // The query must be built in a single string of statements to ensure
+    // that it happens as a single operation, thus either adding it all
+    // or not adding any of it, to prevent errors
     arrOfCategoryObjects.forEach((categoryObj, i) => {
         if (i > 0) queryStr += ",";
         queryStr += `('${categoryObj.category_name}', '${categoryObj.username}')`;
     });
 
+    // Make the query with the DB Connection module
     return dbConnection.query(queryStr)
         .then((result) => {
             logger.log(`Categories added to the database:`, arrOfCategoryObjects);
@@ -89,11 +101,15 @@ module.exports.addCategories = (arrOfCategoryObjects) => {
 module.exports.addSites = (arrOfSiteObjects) => {
     var queryStr = "";
 
+    // The query must be built in a single string of statements to ensure
+    // that it happens as a single operation, thus either adding it all
+    // or not adding any of it, to prevent errors
     arrOfSiteObjects.forEach((siteObj) => {
         queryStr += `INSERT INTO ${dbSchema.SITES_TABLE} (site_name, username) VALUES ('${siteObj.site_name}', '${siteObj.username}');\n` +
-            `SET @site_id = LAST_INSERT_ID();\n`;
+            `SET @site_id = LAST_INSERT_ID();\n`;   // Set the id that will be created for the site above to reuse it in the query below
 
-
+        // For each site, go through the different locations that will be added and insert them as well,
+        // using the id of the previously stored site
         siteObj.locations.forEach((locationName, i) => {
             if (i === 0) queryStr += `INSERT INTO ${dbSchema.LOCATIONS_TABLE} (site_id, location_name) VALUES `;
             if (i > 0) queryStr += `,`;
@@ -104,6 +120,7 @@ module.exports.addSites = (arrOfSiteObjects) => {
         queryStr += ";\n"
     });
 
+    // Make the query with the DB Connection module
     return dbConnection.query(queryStr)
         .then((result) => {
             logger.log(`Sites added to the database:`, arrOfSiteObjects);
@@ -132,6 +149,7 @@ module.exports.showTables = () => {
         .catch((err) => Promise.reject(new DbOperationError(`Failed to show tables\n\n:${err.stack}`)));
 };
 
+// Show the schema of a given table
 module.exports.showTableSchema = (tableName) => {
     return dbConnection.query(`DESCRIBE ${tableName};`)
         .then((result) => {
@@ -141,6 +159,7 @@ module.exports.showTableSchema = (tableName) => {
         .catch((err) => Promise.reject(new DbOperationError(`Failed to describe ${tableName}\n\n:${err.stack}`)));
 };
 
+// Delete a user's account from the table
 module.exports.deleteAccount = (username) => {
     return dbConnection.query(`DELETE FROM ${dbSchema.ACCOUNTS_TABLE} WHERE account = ${username}`)
         .then((result) => {
@@ -186,7 +205,7 @@ module.exports.deleteAllAssets = (username) => {
         .catch((err) => Promise.reject(new DbOperationError(`Failed to delete all assets\n\n:${err.stack}`)));
 };
 
-
+// Fetch the username and password hash of an account
 module.exports.getAccount = (username) => {
     return dbConnection.query(`SELECT * FROM ${dbSchema.ACCOUNTS_TABLE} WHERE username = '${username}';`)
         .then((result) => {
@@ -196,6 +215,7 @@ module.exports.getAccount = (username) => {
         .catch((err) => Promise.reject(new DbOperationError(`Failed to get account\n\n:${err.stack}`)));
 };
 
+// Fetch a category's data
 module.exports.getCategory = (category_name, username) => {
     return dbConnection.query(`SELECT * FROM ${dbSchema.CATEGORIES_TABLE} WHERE category_name = '${category_name}' AND username = '${username}';`)
         .then((result) => {
@@ -205,6 +225,7 @@ module.exports.getCategory = (category_name, username) => {
         .catch((err) => Promise.reject(new DbOperationError(`Failed to get category with name ${category_name}\n\n:${err.stack}`)));
 };
 
+// Fetch the data of all categories stored for a given username
 module.exports.getAllCategories = (username) => {
     return dbConnection.query(`SELECT * FROM ${dbSchema.CATEGORIES_TABLE} WHERE username = '${username}';`)
         .then((result) => {
@@ -214,6 +235,8 @@ module.exports.getAllCategories = (username) => {
         .catch((err) => Promise.reject(new DbOperationError(`Failed to get all categories\n\n:${err.stack}`)));
 };
 
+// Fetch a site's data by id or name, including all the locations that are assigned
+// to that site's id in the Locations table by using INNER JOIN statements
 module.exports.getSite = (siteNameOrId, username) => {
     return dbConnection.query(
         `SELECT * FROM ${dbSchema.SITES_TABLE}\n` +
@@ -227,6 +250,8 @@ module.exports.getSite = (siteNameOrId, username) => {
         .catch((err) => Promise.reject(new DbOperationError(`Failed to get site with identifier ${siteNameOrId}\n\n:${err.stack}`)));
 };
 
+// Get all sites that a given user has stored in the database, including the
+// related locations assigned to each of those sites
 module.exports.getAllSites = (username) => {
     return dbConnection.query(
         `SELECT * FROM ${dbSchema.SITES_TABLE}\n` +
@@ -240,7 +265,8 @@ module.exports.getAllSites = (username) => {
         .catch((err) => Promise.reject(new DbOperationError(`Failed to get all sites\n\n:${err.stack}`)));
 };
 
-// Get all assets in the database and return them
+// Get an asset from the database, including all the data about it, like the
+// purchase data, the maintenance data, etc. using INNER JOIN statements
 module.exports.getAsset = (assetNameOrId, username) => {
     // Select an asset from the Assets table (check database diagram) and return the result
     const queryStr = `SELECT * FROM ${dbSchema.ASSET_TABLE}\n` +
@@ -261,7 +287,7 @@ module.exports.getAsset = (assetNameOrId, username) => {
         .catch((err) => Promise.reject(new DbOperationError(`Failed to select the asset\n\n:${err.stack}`)));
 };
 
-// Get all assets in the database and return them
+// Get all asset names for a user in the database and return them
 module.exports.getAllAssetNames = (username) => {
     // Select All from the Assets table (check database diagram) and return the result
     return dbConnection.query(`SELECT * FROM ${dbSchema.ASSET_TABLE} WHERE username = '${username}'`)
@@ -273,6 +299,7 @@ module.exports.getAllAssetNames = (username) => {
 };
 
 // Get all assets in the database, along with all the data from all the asset tables, and return them
+// for a given username. Use INNER JOINS to fetch the related data from the tables peripheral to the Assets
 module.exports.getFullAssets = (username) => {
     // Select All from the Assets table (check database diagram) and join it using the asset id with each of the tables
     const queryStr = `SELECT * FROM ${dbSchema.ASSET_TABLE}\n` +

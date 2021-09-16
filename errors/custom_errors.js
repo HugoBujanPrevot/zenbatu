@@ -1,4 +1,7 @@
 
+/**
+ * This module contains a list of custom errors used throughout the program
+ */
 
 module.exports.DbOperationError = class DbOperationError extends Error {
     constructor(message) {
