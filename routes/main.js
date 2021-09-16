@@ -37,33 +37,14 @@ module.exports.initRoutes = function (expressApp) {
 
     expressApp.post("/login", (request, response) => {
         const params = request.body;
-        const data = {};
-
-        accountManager.logIn(params.username, params.password)
-            .then((id) => {
-                data.sessionId = id;
-                logger.log(`Fetching data for username ${params.username}...`);
-                return _getUserData(params.username);
-            })
-            .then((userData) => {
-                Object.assign(data, userData);
-                return response.render("user_dashboard.ejs", data);
-            })
-            .catch((err) =>
-            {
-                logger.log(`Error occurred:`, err);
-                response.render("user_dashboard.ejs", { success: false, err: err.message });
-            });
+        _logIn(params.username, params.password, response);
     });
 
     expressApp.post("/create_user", (request, response) => {
         const params = request.body;
 
-        Promise.resolve(dbOperations.createConnection(params.ip))
-            .then(() => dbOperations.connect())
-            .then(() => accountManager.signUp(params.username, params.password))
-            .then(() => response.send({success: true }))
-            .catch((err) => response.send({ success: false, err: err.message } ));
+        return accountManager.signUp(params.username, params.password)
+            .then(() => _logIn(params.username, params.password, response))
     });
 
     expressApp.post("/get_asset", (request, response) => {
@@ -158,6 +139,20 @@ module.exports.initRoutes = function (expressApp) {
     });
 }
 
+
+async function _logIn(username, password, response)
+{
+    try {
+        const sessionId = await accountManager.logIn(username, password);
+        logger.log(`Fetching data for username ${username}...`);
+        const data = await _getUserData(username);
+        data.sessionId = sessionId;
+        return response.render("user_dashboard.ejs", data);
+    } catch(err) {
+        logger.log(`Error occurred:`, err);
+        response.render("user_dashboard.ejs", { success: false, err: err.message });
+    }
+}
 async function _getUserData(username)
 {
     const data = {};
