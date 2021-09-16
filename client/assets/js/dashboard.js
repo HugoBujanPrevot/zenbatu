@@ -132,7 +132,8 @@ function _addSite(siteData)
     console.log(siteData);
     $("#assetSiteInput").append($("<option>", {
         value: siteData.location_id,
-        text: `${siteData.site_name} - ${siteData.location_name}`
+        text: `${siteData.site_name} - ${siteData.location_name}`,
+        "data-site_id": siteData.site_id
     }));
 
     $("#addLocationSiteInput").append($("<option>", {
