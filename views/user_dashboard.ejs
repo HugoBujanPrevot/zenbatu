@@ -22,33 +22,28 @@
 
                         <div class="row">
                             <div class="col-3">
-                                <input class="form-control" id="assetNameInput" name="asset_name" type="text" placeholder="Name" required>
+                                <div class="form-group">
+                                    <label for="assetNameInput" class="control-label">Asset Name</label>
+                                    <input class="form-control" id="assetNameInput" name="asset_name" type="text" placeholder="Name" required>
+                                </div>
                             </div>
                             <div class="col-3">
-                                <input class="form-control" id="assetBrandInput" name="brand" type="text" placeholder="Brand, i.e. Apple" required>
+                                <div class="form-group">
+                                    <label for="assetBrandInput" class="control-label">Brand</label>
+                                    <input class="form-control" id="assetBrandInput" name="brand" type="text" placeholder="Brand, i.e. Apple" required>
+                                </div>
                             </div>
                             <div class="col-3">
-                                <input class="form-control" id="assetModelInput" name="model" type="text" placeholder="Model, i.e. A2338" required>
+                                <div class="form-group">
+                                    <label for="assetModelInput" class="control-label">Model</label>
+                                    <input class="form-control" id="assetModelInput" name="model" type="text" placeholder="Model, i.e. A2338" required>
+                                </div>
                             </div>
                             <div class="col-3">
-                                <input class="form-control" id="assetSerialInput" name="serial_no" type="text" placeholder="Serial No" required>
-                            </div>
-                        </div>
-
-                        <br />
-
-                        <div class="row">
-                            <div class="col-3">
-                                <input class="form-control" id="assetPurchaseDateInput" name="purchase_date" type="date" required>
-                            </div>
-                            <div class="col-3">
-                                <input class="form-control" id="assetCostInput" name="cost" type="number" required>
-                            </div>
-                            <div class="col-3">
-                                <input class="form-control" id="assetVendorInput" name="vendor" type="text" placeholder="Vendor, i.e. Amazon" required>
-                            </div>
-                            <div class="col-3">
-                                <input class="form-control" id="assetLifeInput" name="useful_life" type="number" required>
+                                <div class="form-group">
+                                    <label for="assetSerialInput" class="control-label">Serial No</label>
+                                    <input class="form-control" id="assetSerialInput" name="serial_no" type="text" placeholder="Serial No" required>
+                                </div>
                             </div>
                         </div>
 
@@ -56,36 +51,74 @@
 
                         <div class="row">
                             <div class="col-3">
-                                <select class="form-control" id="assetMaintenanceInput" name="maintenance_schedule" required>
-                                    <option value="weekly">Weekly</option>
-                                    <option value="biweekly">Biweekly</option>
-                                    <option value="monthly">Monthly</option>
-                                    <option value="quarterly">Quarterly</option>
-                                </select>
+                                <div class="form-group">
+                                    <label for="assetPurchaseDateInput" class="control-label">Purchase Date</label>
+                                    <input class="form-control" id="assetPurchaseDateInput" name="purchase_date" type="date" required>
+                                </div>
                             </div>
                             <div class="col-3">
-                                <select class="form-control" id="assetCategoryInput" name="category_id" required>
-
-                                    <% if (typeof categories === "object" && Array.isArray(categories) === true) { %>
-
-                                    <% categories.forEach((category) => { %>
-                                    <option value=<%=category.category_id %>><%=category.category_name %></option>
-                                    <% }); %>
-
-                                    <% } %>
-                                </select>
-                            </div>     
+                                <div class="form-group">
+                                    <label for="assetCostInput" class="control-label">Cost</label>
+                                    <input class="form-control" id="assetCostInput" name="cost" type="number" placeholder="Cost" required>
+                                </div>
+                            </div>
                             <div class="col-3">
-                                <select class="form-control" id="assetSiteInput" name="location_id" required>
+                                <div class="form-group">
+                                    <label for="assetVendorInput" class="control-label">Vendor</label>
+                                    <input class="form-control" id="assetVendorInput" name="vendor" type="text" placeholder="Vendor, i.e. Amazon" required>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="form-group">
+                                    <label for="assetLifeInput" class="control-label">Useful Life</label>
+                                    <input class="form-control" id="assetLifeInput" name="useful_life" type="number" placeholder="Useful Life" required>
+                                </div>
+                            </div>
+                        </div>
 
-                                    <% if (typeof sites === "object" && Array.isArray(sites) === true) { %>
+                        <br />
 
-                                    <% sites.forEach((site) => { %>
-                                    <option data-site_id=<%=site.site_id %> value=<%=site.location_id %>><%=`${site.site_name} - ${site.location_name}` %></option>
-                                    <% }); %>
+                        <div class="row">
+                            <div class="col-3">
+                                <div class="form-group">
+                                    <label for="assetMaintenanceInput" class="control-label">Maintenance Schedule</label>
+                                    <select class="form-control" id="assetMaintenanceInput" name="maintenance_schedule" required>
+                                        <option value="weekly">Weekly</option>
+                                        <option value="biweekly">Biweekly</option>
+                                        <option value="monthly">Monthly</option>
+                                        <option value="quarterly">Quarterly</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="form-group">
+                                    <label for="assetCategoryInput" class="control-label">Category</label>
+                                    <select class="form-control" id="assetCategoryInput" name="category_id" required>
 
-                                    <% } %>
-                                </select>
+                                        <% if (typeof categories === "object" && Array.isArray(categories) === true) { %>
+
+                                        <% categories.forEach((category) => { %>
+                                        <option value=<%=category.category_id %>><%=category.category_name %></option>
+                                        <% }); %>
+
+                                        <% } %>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="form-group">
+                                    <label for="assetSiteInput" class="control-label">Location</label>
+                                    <select class="form-control" id="assetSiteInput" name="location_id" required>
+
+                                        <% if (typeof sites === "object" && Array.isArray(sites) === true) { %>
+
+                                        <% sites.forEach((site) => { %>
+                                        <option data-site_id=<%=site.site_id %> value=<%=site.location_id %>><%=`${site.site_name} - ${site.location_name}` %></option>
+                                        <% }); %>
+
+                                        <% } %>
+                                    </select>
+                                </div>
                             </div>
                         </div>
 
@@ -145,7 +178,7 @@
                     <form class="form-inline" id="addLocationForm" action="/add_location" method="POST">
                         <input type="hidden" name="sessionId" value="<%=(typeof sessionId === "string") ? sessionId : "none"%>"/>
                         <div class="input-group mb-3">
-                            
+
                             <select class="form-control" id="addLocationSiteInput" name="site_id" required>
 
                                 <% if (typeof sites === "object" && Array.isArray(sites) === true) { %>
