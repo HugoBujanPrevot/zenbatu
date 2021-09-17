@@ -11,6 +11,7 @@
  */
 
 // Required modules
+const sqlString = require("sqlstring");
 const logger = require("../logger/logger");
 const dbSchema = require("../data/db_schema.json");
 const dbConnection = require("./database_connection");
@@ -38,7 +39,7 @@ module.exports.getConnectionState = () => {
 
 // Add a user account to the Accounts table
 module.exports.addAccount = (username, password) => {
-    return dbConnection.query(`INSERT INTO ${dbSchema.ACCOUNTS_TABLE} (username, password) VALUES ('${username}', '${password}');`)
+    return dbConnection.query(`INSERT INTO ${dbSchema.ACCOUNTS_TABLE} (username, password) VALUES (${sqlString.escape(username)}, ${sqlString.escape(password)});`)
         .then((result) => {
             logger.log(`Account with username '${username}' added to the database`);
             return Promise.resolve(result);
@@ -60,11 +61,11 @@ module.exports.addAssets = (arrOfAssetObjects) => {
     // that it happens as a single operation, thus either adding it all
     // or not adding any of it, to prevent errors
     arrOfAssetObjects.forEach((assetObj, i) => {
-        queryStr += `\nINSERT INTO ${dbSchema.ASSET_TABLE} (asset_id, asset_name, username) VALUES ('${assetObj.asset_id}', '${assetObj.asset_name}', '${assetObj.username}');\n` +
-            `INSERT INTO ${dbSchema.ASSET_LOCATION_TABLE} (asset_id, site_id, location_id) VALUES ('${assetObj.asset_id}', '${assetObj.site_id}', '${assetObj.location_id}');\n` +
-            `INSERT INTO ${dbSchema.ASSET_TYPE_TABLE} (asset_id, brand, model, serial_no, category_id) VALUES ('${assetObj.asset_id}', '${assetObj.brand}', '${assetObj.model}', '${assetObj.serial_no}', '${assetObj.category_id}');\n` +
-            `INSERT INTO ${dbSchema.ASSET_PURCHASE_TABLE} (asset_id, purchase_date, cost, vendor, useful_life) VALUES ('${assetObj.asset_id}', '${assetObj.purchase_date}', '${assetObj.cost}', '${assetObj.vendor}', '${assetObj.useful_life}');\n` +
-            `INSERT INTO ${dbSchema.ASSET_MAINTENANCE_TABLE} (asset_id, maintenance_schedule) VALUES ('${assetObj.asset_id}', '${assetObj.maintenance_schedule}');\n`
+        queryStr += `\nINSERT INTO ${dbSchema.ASSET_TABLE} (asset_id, asset_name, username) VALUES (${sqlString.escape(assetObj.asset_id)}, ${sqlString.escape(assetObj.asset_name)}, ${sqlString.escape(assetObj.username)});\n` +
+            `INSERT INTO ${dbSchema.ASSET_LOCATION_TABLE} (asset_id, site_id, location_id) VALUES (${sqlString.escape(assetObj.asset_id)}, ${sqlString.escape(assetObj.site_id)}, ${sqlString.escape(assetObj.location_id)});\n` +
+            `INSERT INTO ${dbSchema.ASSET_TYPE_TABLE} (asset_id, brand, model, serial_no, category_id) VALUES (${sqlString.escape(assetObj.asset_id)}, ${sqlString.escape(assetObj.brand)}, ${sqlString.escape(assetObj.model)}, ${sqlString.escape(assetObj.serial_no)}, ${sqlString.escape(assetObj.category_id)});\n` +
+            `INSERT INTO ${dbSchema.ASSET_PURCHASE_TABLE} (asset_id, purchase_date, cost, vendor, useful_life) VALUES (${sqlString.escape(assetObj.asset_id)}, ${sqlString.escape(assetObj.purchase_date)}, ${sqlString.escape(assetObj.cost)}, ${sqlString.escape(assetObj.vendor)}, ${sqlString.escape(assetObj.useful_life)});\n` +
+            `INSERT INTO ${dbSchema.ASSET_MAINTENANCE_TABLE} (asset_id, maintenance_schedule) VALUES (${sqlString.escape(assetObj.asset_id)}, ${sqlString.escape(assetObj.maintenance_schedule)});\n`
     });
 
     // Make the query with the DB Connection module
@@ -85,7 +86,7 @@ module.exports.addCategories = (arrOfCategoryObjects) => {
     // or not adding any of it, to prevent errors
     arrOfCategoryObjects.forEach((categoryObj, i) => {
         if (i > 0) queryStr += ",";
-        queryStr += `('${categoryObj.category_name}', '${categoryObj.username}')`;
+        queryStr += `(${sqlString.escape(categoryObj.category_name)}, ${sqlString.escape(categoryObj.username)})`;
     });
 
     // Make the query with the DB Connection module
@@ -105,7 +106,7 @@ module.exports.addSites = (arrOfSiteObjects) => {
     // that it happens as a single operation, thus either adding it all
     // or not adding any of it, to prevent errors
     arrOfSiteObjects.forEach((siteObj) => {
-        queryStr += `INSERT INTO ${dbSchema.SITES_TABLE} (site_name, username) VALUES ('${siteObj.site_name}', '${siteObj.username}');\n` +
+        queryStr += `INSERT INTO ${dbSchema.SITES_TABLE} (site_name, username) VALUES (${sqlString.escape(siteObj.site_name)}, ${sqlString.escape(siteObj.username)});\n` +
             `SET @site_id = LAST_INSERT_ID();\n`;   // Set the id that will be created for the site above to reuse it in the query below
 
         // For each site, go through the different locations that will be added and insert them as well,
@@ -114,7 +115,7 @@ module.exports.addSites = (arrOfSiteObjects) => {
             if (i === 0) queryStr += `INSERT INTO ${dbSchema.LOCATIONS_TABLE} (site_id, location_name) VALUES `;
             if (i > 0) queryStr += `,`;
 
-            queryStr += `\n(@site_id, '${locationName}')`;
+            queryStr += `\n(@site_id, ${sqlString.escape(locationName)})`;
         });
 
         queryStr += ";\n"
@@ -131,7 +132,7 @@ module.exports.addSites = (arrOfSiteObjects) => {
 
 // Add a location to an existing site
 module.exports.addLocation = (siteId, locationName) => {
-    return dbConnection.query(`INSERT INTO ${dbSchema.LOCATIONS_TABLE} (site_id, location_name) VALUES ('${siteId}', '${locationName}');`)
+    return dbConnection.query(`INSERT INTO ${dbSchema.LOCATIONS_TABLE} (site_id, location_name) VALUES (${sqlString.escape(siteId)}, ${sqlString.escape(locationName)});`)
         .then((result) => {
             logger.log(`Location added to the database:`, locationName);
             return Promise.resolve(result);
@@ -173,7 +174,7 @@ module.exports.deleteAsset = (assetId, username) => {
     // All sub-tables (AssetLocation, AssetPurchase, etc.) where asset_id is a foreign key should be
     // defined with the ON DELETE CASCADE constraint, so that when an asset is deleted on the Assets
     // table, all the rows on the sub-tables belonging to the same asset will also be deleted
-    return dbConnection.query(`DELETE FROM ${dbSchema.ASSET_TABLE} WHERE asset_id = '${assetId}' AND username = '${username}'`)
+    return dbConnection.query(`DELETE FROM ${dbSchema.ASSET_TABLE} WHERE asset_id = ${sqlString.escape(assetId)} AND username = ${sqlString.escape(username)}`)
         .then((result) => {
             logger.log(`Asset with id ${assetId} deleted from database`);
             return Promise.resolve(result);
@@ -185,7 +186,7 @@ module.exports.deleteAssets = (assetIds, username) => {
     // All sub-tables (AssetLocation, AssetPurchase, etc.) where asset_id is a foreign key should be
     // defined with the ON DELETE CASCADE constraint, so that when an asset is deleted on the Assets
     // table, all the rows on the sub-tables belonging to the same asset will also be deleted
-    return dbConnection.query(`DELETE FROM ${dbSchema.ASSET_TABLE} WHERE asset_id IN ('${assetIds.join("','")}') AND username = '${username}'`)
+    return dbConnection.query(`DELETE FROM ${dbSchema.ASSET_TABLE} WHERE asset_id IN ('${assetIds.join("','")}') AND username = ${sqlString.escape(username)}`)
         .then((result) => {
             logger.log(`Assets deleted from database:`, assetIds);
             return Promise.resolve(result);
@@ -197,7 +198,7 @@ module.exports.deleteAllAssets = (username) => {
     // All sub-tables (AssetLocation, AssetPurchase, etc.) where asset_id is a foreign key should be
     // defined with the ON DELETE CASCADE constraint, so that when an asset is deleted on the Assets
     // table, all the rows on the sub-tables belonging to the same asset will also be deleted
-    return dbConnection.query(`DELETE FROM ${dbSchema.ASSET_TABLE} WHERE username = '${username}'`)
+    return dbConnection.query(`DELETE FROM ${dbSchema.ASSET_TABLE} WHERE username = ${sqlString.escape(username)}`)
         .then((result) => {
             logger.log(`Deleted *all* assets from database`);
             return Promise.resolve(result);
@@ -207,7 +208,7 @@ module.exports.deleteAllAssets = (username) => {
 
 // Fetch the username and password hash of an account
 module.exports.getAccount = (username) => {
-    return dbConnection.query(`SELECT * FROM ${dbSchema.ACCOUNTS_TABLE} WHERE username = '${username}';`)
+    return dbConnection.query(`SELECT * FROM ${dbSchema.ACCOUNTS_TABLE} WHERE username = ${sqlString.escape(username)};`)
         .then((result) => {
             logger.log(`Fetched account with username ${username} from database`);
             return Promise.resolve(result[0]);
@@ -217,7 +218,7 @@ module.exports.getAccount = (username) => {
 
 // Fetch a category's data
 module.exports.getCategory = (category_name, username) => {
-    return dbConnection.query(`SELECT * FROM ${dbSchema.CATEGORIES_TABLE} WHERE category_name = '${category_name}' AND username = '${username}';`)
+    return dbConnection.query(`SELECT * FROM ${dbSchema.CATEGORIES_TABLE} WHERE category_name = ${sqlString.escape(category_name)} AND username = ${sqlString.escape(username)};`)
         .then((result) => {
             logger.log(`Fetched category with name ${category_name} from database`);
             return Promise.resolve(result[0]);
@@ -227,7 +228,7 @@ module.exports.getCategory = (category_name, username) => {
 
 // Fetch the data of all categories stored for a given username
 module.exports.getAllCategories = (username) => {
-    return dbConnection.query(`SELECT * FROM ${dbSchema.CATEGORIES_TABLE} WHERE username = '${username}';`)
+    return dbConnection.query(`SELECT * FROM ${dbSchema.CATEGORIES_TABLE} WHERE username = ${sqlString.escape(username)};`)
         .then((result) => {
             logger.log(`Fetched all categories from database`);
             return Promise.resolve(result);
@@ -241,7 +242,7 @@ module.exports.getSite = (siteNameOrId, username) => {
     return dbConnection.query(
         `SELECT * FROM ${dbSchema.SITES_TABLE}\n` +
         `INNER JOIN ${dbSchema.LOCATIONS_TABLE} ON ${dbSchema.SITES_TABLE}.site_id = ${dbSchema.LOCATIONS_TABLE}.site_id\n` +
-        `WHERE (${dbSchema.SITES_TABLE}.site_name = '${siteNameOrId}' OR ${dbSchema.SITES_TABLE}.site_id = '${siteNameOrId}') AND ${dbSchema.SITES_TABLE}.username = '${username}'`
+        `WHERE (${dbSchema.SITES_TABLE}.site_name = ${sqlString.escape(siteNameOrId)} OR ${dbSchema.SITES_TABLE}.site_id = ${sqlString.escape(siteNameOrId)}) AND ${dbSchema.SITES_TABLE}.username = ${sqlString.escape(username)}`
     )
         .then((result) => {
             logger.log(`Fetched site with identifier ${siteNameOrId} from database`);
@@ -256,7 +257,7 @@ module.exports.getAllSites = (username) => {
     return dbConnection.query(
         `SELECT * FROM ${dbSchema.SITES_TABLE}\n` +
         `INNER JOIN ${dbSchema.LOCATIONS_TABLE} ON ${dbSchema.SITES_TABLE}.site_id = ${dbSchema.LOCATIONS_TABLE}.site_id\n` +
-        `WHERE ${dbSchema.SITES_TABLE}.username = '${username}';`
+        `WHERE ${dbSchema.SITES_TABLE}.username = ${sqlString.escape(username)};`
     )
         .then((result) => {
             logger.log(`Fetched all sites from database`);
@@ -277,7 +278,7 @@ module.exports.getAsset = (assetNameOrId, username) => {
     `INNER JOIN ${dbSchema.CATEGORIES_TABLE} ON ${dbSchema.ASSET_TYPE_TABLE}.category_id = ${dbSchema.CATEGORIES_TABLE}.category_id\n` +
     `INNER JOIN ${dbSchema.ASSET_PURCHASE_TABLE} ON ${dbSchema.ASSET_TABLE}.asset_id = ${dbSchema.ASSET_PURCHASE_TABLE}.asset_id\n` +
     `INNER JOIN ${dbSchema.ASSET_MAINTENANCE_TABLE} ON ${dbSchema.ASSET_TABLE}.asset_id = ${dbSchema.ASSET_MAINTENANCE_TABLE}.asset_id\n` +
-    `WHERE (${dbSchema.ASSET_TABLE}.asset_name = '${assetNameOrId}' OR ${dbSchema.ASSET_TABLE}.asset_id = '${assetNameOrId}') AND ${dbSchema.ASSET_TABLE}.username = '${username}';`;
+    `WHERE (${dbSchema.ASSET_TABLE}.asset_name = ${sqlString.escape(assetNameOrId)} OR ${dbSchema.ASSET_TABLE}.asset_id = ${sqlString.escape(assetNameOrId)}) AND ${dbSchema.ASSET_TABLE}.username = ${sqlString.escape(username)};`;
 
     return dbConnection.query(queryStr)
         .then((result) => {
@@ -290,7 +291,7 @@ module.exports.getAsset = (assetNameOrId, username) => {
 // Get all asset names for a user in the database and return them
 module.exports.getAllAssetNames = (username) => {
     // Select All from the Assets table (check database diagram) and return the result
-    return dbConnection.query(`SELECT * FROM ${dbSchema.ASSET_TABLE} WHERE username = '${username}'`)
+    return dbConnection.query(`SELECT * FROM ${dbSchema.ASSET_TABLE} WHERE username = ${sqlString.escape(username)}`)
         .then((result) => {
             logger.log(`Fetched all asset names from database:`, result);
             return Promise.resolve(result);
@@ -310,7 +311,7 @@ module.exports.getFullAssets = (username) => {
     `INNER JOIN ${dbSchema.CATEGORIES_TABLE} ON ${dbSchema.ASSET_TYPE_TABLE}.category_id = ${dbSchema.CATEGORIES_TABLE}.category_id\n` +
     `INNER JOIN ${dbSchema.ASSET_PURCHASE_TABLE} ON ${dbSchema.ASSET_TABLE}.asset_id = ${dbSchema.ASSET_PURCHASE_TABLE}.asset_id\n` +
     `INNER JOIN ${dbSchema.ASSET_MAINTENANCE_TABLE} ON ${dbSchema.ASSET_TABLE}.asset_id = ${dbSchema.ASSET_MAINTENANCE_TABLE}.asset_id\n` +
-    `WHERE ${dbSchema.ASSET_TABLE}.username = '${username}';`;
+    `WHERE ${dbSchema.ASSET_TABLE}.username = ${sqlString.escape(username)};`;
 
     return dbConnection.query(queryStr)
         .then((result) => {
@@ -324,7 +325,7 @@ module.exports.getFullAssets = (username) => {
 module.exports.getAssetLocation = (assetId) => {
     // Check that the given assetId (the asset's database id, to be clear) is indeed an integer
     if (Number.isInteger(assetId) === false)
-        throw new TypeError(`Expected integer asset id, got '${assetId}' instead.`);
+        throw new TypeError(`Expected integer asset id, got ${sqlString.escape(assetId)} instead.`);
 
     // Select the asset with given id from the AssetLocation table and return it
     return dbConnection.query(
