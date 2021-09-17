@@ -22,12 +22,18 @@
                         <form action="/login" method="post" class="connect-form">
                             <div class="row gy-4">
 
-                                <div class="col-md-12 ">
-                                    <input type="text" class="form-control" name="username" placeholder="Username" required>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="username" class="control-label">Username</label>
+                                        <input type="text" class="form-control" name="username" id="username" placeholder="Username" required>
+                                    </div>
                                 </div>
 
                                 <div class="col-md-12">
-                                    <input type="password" class="form-control" name="password" placeholder="Password" required>
+                                    <div class="form-group">
+                                        <label for="password" class="control-label">Password</label>
+                                        <input type="password" class="form-control" name="password" id="password" placeholder="Password" required>
+                                    </div>
                                 </div>
 
                                 <div class="col-md-12 text-center">
