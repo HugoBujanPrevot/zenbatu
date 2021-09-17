@@ -158,15 +158,32 @@
                 </div>
 
                 <div class="card-body">
-                    <form class="form-inline" id="addSiteForm" action="/add_site" method="POST">
+                    <form id="addSiteForm" action="/add_site" method="POST">
                         <input type="hidden" name="sessionId" value="<%=(typeof sessionId === "string") ? sessionId : "none"%>"/>
-                        <div class="input-group mb-3">
-                            <input class="form-control" id="siteNameInput" name="site_name" type="text" placeholder="Site Name">
-                            <input class="form-control" id="basicLocationNameInput" name="location_name" type="text" placeholder="Site Location Name">
-                            <div class="input-group-append">
-                                <input class="btn btn-primary" type="submit" value="Add" >
+
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="siteNameInput" class="control-label">Site Name</label>
+                                    <input class="form-control" id="siteNameInput" name="site_name" type="text" placeholder="Site Name">
+                                </div>
                             </div>
                         </div>
+
+                        <br />
+
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="basicLocationNameInput" class="control-label">Site Location Name</label>
+                                    <input class="form-control" id="basicLocationNameInput" name="location_name" type="text" placeholder="Site Location Name">
+                                </div>
+                            </div>
+                        </div>
+
+                        <br />
+
+                        <input class="btn btn-primary" type="submit" value="Add Site" />
                     </form>
                 </div>
 
