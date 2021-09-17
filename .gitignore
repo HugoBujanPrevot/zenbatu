@@ -8,6 +8,3 @@ package-lock.json
 
 #executables created by pkg
 index-*
-
-#ignore test manager which is not ready
-test_manager/
