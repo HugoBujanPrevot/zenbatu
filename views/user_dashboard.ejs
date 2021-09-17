@@ -138,10 +138,13 @@
                 <div class="card-body">
                     <form class="form-inline" id="addCategoryForm" action="/add_category" method="POST">
                         <input type="hidden" name="sessionId" value="<%=(typeof sessionId === "string") ? sessionId : "none"%>"/>
-                        <div class="input-group mb-3">
-                            <input class="form-control" id="categoryNameInput" name="category_name" type="text" placeholder="Category Name">
-                            <div class="input-group-append">
-                                <input class="btn btn-primary" type="submit" value="Add" >
+                        <div class="form-group">
+                            <label for="categoryNameInput" class="control-label">Category Name</label>
+                            <div class="input-group mb-3">
+                                <input class="form-control" id="categoryNameInput" name="category_name" type="text" placeholder="Category Name">
+                                <div class="input-group-append">
+                                    <input class="btn btn-primary" type="submit" value="Add" >
+                                </div>
                             </div>
                         </div>
                     </form>
