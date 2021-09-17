@@ -195,28 +195,43 @@
                 </div>
 
                 <div class="card-body">
-                    <form class="form-inline" id="addLocationForm" action="/add_location" method="POST">
+                    <form id="addLocationForm" action="/add_location" method="POST">
                         <input type="hidden" name="sessionId" value="<%=(typeof sessionId === "string") ? sessionId : "none"%>"/>
-                        <div class="input-group mb-3">
 
-                            <select class="form-control" id="addLocationSiteInput" name="site_id" required>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="addLocationSiteInput" class="control-label">Location Site</label>
+                                    <select class="form-control" id="addLocationSiteInput" name="site_id" required>
 
-                                <% if (typeof sites === "object" && Array.isArray(sites) === true) { %>
-                                <% var addedSites = []; %>
-                                <% sites.forEach((site) => { %>
-                                <% if (sites.includes(site.site_name) === false) { %>
-                                    <% sites.push(site.site_name); %>
-                                    <option value=<%=site.site_id %>><%=site.site_name %></option>
-                                <% }}); %>
+                                        <% if (typeof sites === "object" && Array.isArray(sites) === true) { %>
+                                        <% var addedSites = []; %>
+                                        <% sites.forEach((site) => { %>
+                                        <% if (sites.includes(site.site_name) === false) { %>
+                                            <% sites.push(site.site_name); %>
+                                            <option value=<%=site.site_id %>><%=site.site_name %></option>
+                                        <% }}); %>
 
-                                <% } %>
-                            </select>
-
-                            <input class="form-control" id="locationNameInput" name="location_name" type="text" placeholder="New Location Name">
-                            <div class="input-group-append">
-                                <input class="btn btn-primary" type="submit" value="Add" >
+                                        <% } %>
+                                    </select>
+                                </div>
                             </div>
                         </div>
+
+                        <br />
+
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="locationNameInput" class="control-label">New Location Name</label>
+                                    <input class="form-control" id="locationNameInput" name="location_name" type="text" placeholder="New Location Name">
+                                </div>
+                            </div>
+                        </div>
+
+                        <br />
+
+                        <input class="btn btn-primary" type="submit" value="Add Location to Site" >
                     </form>
                 </div>
 
